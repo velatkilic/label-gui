@@ -3,10 +3,14 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
 
 ![](/imgs/gui.png)
 
-The GUI can be run from the command line
-```
-python app.py
-```
+- Install dependencies
+	```
+	pip install -r requirements.txt
+	```
+- Navigate into the src directory and run from the command line
+	```
+	python app.py
+	```
 After the class label is entered into the textbox area, pressing the **Add** button creates a color dialog which determines the bounding box color.
 ![](/imgs/add_label.png)
 
