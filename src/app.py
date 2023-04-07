@@ -29,6 +29,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # main window title
         self.setWindowTitle("Human-in-the-Loop Annotation")
 
+        # label mode
+        self.label_mode = "segmentation"
+        self.radio_segmentation.clicked.connect(self.label_mode_segmentation)
+        self.radio_bbox.clicked.connect(self.label_mode_bbox)
+        self.radio_off.clicked.connect(self.label_mode_off)
+
         # view_box holds images and ROIs
         self.view_box = ViewBox(lockAspect=True, invertY=True)
         self.hist = pg.HistogramLUTItem()
@@ -48,6 +54,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # prev/next buttons
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
+
+    def label_mode_segmentation(self):
+        self.label_mode = "segmentation"
+        self.spinBox_mask_scale.setEnabled(True)
+
+    def label_mode_bbox(self):
+        self.label_mode = "bbox"
+        self.spinBox_mask_scale.setEnabled(False)
+
+    def label_mode_off(self):
+        self.label_mode = "off"
+        self.spinBox_mask_scale.setEnabled(False)
 
     def prev(self):
         # update image and annotation data

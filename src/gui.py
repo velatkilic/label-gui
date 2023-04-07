@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -31,6 +29,42 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setObjectName("label")
+        self.verticalLayout_4.addWidget(self.label)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.radio_segmentation = QtWidgets.QRadioButton(self.centralwidget)
+        self.radio_segmentation.setChecked(True)
+        self.radio_segmentation.setObjectName("radio_segmentation")
+        self.horizontalLayout_3.addWidget(self.radio_segmentation)
+        self.radio_bbox = QtWidgets.QRadioButton(self.centralwidget)
+        self.radio_bbox.setObjectName("radio_bbox")
+        self.horizontalLayout_3.addWidget(self.radio_bbox)
+        self.radio_off = QtWidgets.QRadioButton(self.centralwidget)
+        self.radio_off.setObjectName("radio_off")
+        self.horizontalLayout_3.addWidget(self.radio_off)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout_mask_scale = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_mask_scale.setObjectName("horizontalLayout_mask_scale")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_mask_scale.addWidget(self.label_3)
+        self.spinBox_mask_scale = QtWidgets.QSpinBox(self.centralwidget)
+        self.spinBox_mask_scale.setMinimum(1)
+        self.spinBox_mask_scale.setMaximum(3)
+        self.spinBox_mask_scale.setObjectName("spinBox_mask_scale")
+        self.horizontalLayout_mask_scale.addWidget(self.spinBox_mask_scale)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_mask_scale)
+        self.verticalLayout.addLayout(self.verticalLayout_4)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.horizontalLayout.setSpacing(10)
@@ -70,6 +104,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout_5.addWidget(self.label_2)
+        self.spinBox_frame_id = QtWidgets.QSpinBox(self.centralwidget)
+        self.spinBox_frame_id.setMaximum(999999999)
+        self.spinBox_frame_id.setObjectName("spinBox_frame_id")
+        self.horizontalLayout_5.addWidget(self.spinBox_frame_id)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.button_prev = QtWidgets.QPushButton(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -86,7 +130,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -121,8 +165,14 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.label.setText(_translate("MainWindow", "Label Mode"))
+        self.radio_segmentation.setText(_translate("MainWindow", "Segmentation Mask"))
+        self.radio_bbox.setText(_translate("MainWindow", "Bounding Box"))
+        self.radio_off.setText(_translate("MainWindow", "Off"))
+        self.label_3.setText(_translate("MainWindow", "Mask Scale"))
         self.class_label.setText(_translate("MainWindow", "class label"))
         self.button_add_class_label.setText(_translate("MainWindow", "Add"))
+        self.label_2.setText(_translate("MainWindow", "Frame ID"))
         self.button_prev.setText(_translate("MainWindow", "Prev"))
         self.button_next.setText(_translate("MainWindow", "Next"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
@@ -138,4 +188,5 @@ class Ui_MainWindow(object):
         self.action_toggle_side_menu.setStatusTip(_translate("MainWindow", "Hide/Unhide class label side menu"))
         self.actionROI.setText(_translate("MainWindow", "ROI"))
         self.action_roi_settings.setText(_translate("MainWindow", "ROI"))
+
 from pyqtgraph import GraphicsLayoutWidget
