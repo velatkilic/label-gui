@@ -236,6 +236,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="action_load_video"/>
     <addaction name="action_load_images"/>
     <addaction name="action_load_annot"/>
     <addaction name="separator"/>
@@ -246,7 +247,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_load_images">
    <property name="text">
-    <string>Load Images</string>
+    <string>Load Image Folder</string>
    </property>
    <property name="statusTip">
     <string>Load Images. Navigate to a video or images folder</string>
@@ -295,6 +296,11 @@
   <action name="action_roi_settings">
    <property name="text">
     <string>ROI</string>
+   </property>
+  </action>
+  <action name="action_load_video">
+   <property name="text">
+    <string>Load Video File</string>
    </property>
   </action>
  </widget>

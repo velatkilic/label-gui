@@ -5,7 +5,8 @@ import json
 
 from gui import Ui_MainWindow
 from viewbox import ViewBox
-from roi import annot_to_label
+from dataset import Dataset
+from model import Model
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
@@ -29,6 +30,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # main window title
         self.setWindowTitle("Human-in-the-Loop Annotation")
 
+        # dataset
+        self.last_dir = Path(os.getcwd())
+        self.idx = 0
+        self.dset = Dataset()
+
+        # model
+        # self.model = Model()
+
         # label mode
         self.label_mode = "segmentation"
         self.radio_segmentation.clicked.connect(self.label_mode_segmentation)
@@ -47,6 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_list.currentItemChanged.connect(self.current_label_changed)
 
         # action menu items: File
+        self.action_load_video.triggered.connect(self.load_video)
         self.action_load_images.triggered.connect(self.load_images)
         self.action_load_annot.triggered.connect(self.load_annot)
         self.action_save.triggered.connect(self.save_annot)
@@ -54,6 +64,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # prev/next buttons
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
+
+    def load_images(self) -> None:
+        fname = QFileDialog.getExistingDirectory(self, 'Select Folder', str(self.last_dir))
+        if len(fname):
+            fname = Path(fname)
+            self.dset.set_image_folder(fname)
+            self.last_dir = os.path.dirname(fname)
+            self.idx = 0
+            self.set_hist()
+    
+    def load_video(self):
+        fname = QFileDialog.getOpenFileName(self, "Select Video File", str(self.last_dir), "Video Files (*.mp4; *.avi)")[0]
+        if len(fname) > 0:
+            fname = Path(fname)
+            self.dset.set_video_name(fname)
+            self.last_dir = os.path.dirname(fname)
+            self.idx = 0
+            self.set_hist()
+
+    def save(self) -> Path:
+        # directory and filename for saving annotation data in json format
+        cwd = os.getcwd()
+        fname = QFileDialog.getSaveFileName(self, "Save file", str(cwd), "JSON files (*.json)")
+        return Path(fname[0])
 
     def label_mode_segmentation(self):
         self.label_mode = "segmentation"
@@ -68,18 +102,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spinBox_mask_scale.setEnabled(False)
 
     def prev(self):
-        # update image and annotation data
-        self.view_box.prev()
+        if len(self.dset) > 0:
+            # update image and annotation data
+            self.idx = (self.idx - 1) % len(self.dset)
+            img = self.dset[self.idx]
+            self.view_box.set_image(img)
 
-        # update histogram
-        self.update_hist()
+            # update histogram
+            self.update_hist()
 
     def next(self):
-        # update image and annotation data
-        self.view_box.next()
+        if len(self.dset) > 0:
+            # update image and annotation data
+            self.idx = (self.idx + 1) % len(self.dset)
+            img = self.dset[self.idx]
+            self.view_box.set_image(img)
 
-        # update histogram
-        self.update_hist()
+            # update histogram
+            self.update_hist()
     
     def update_hist(self):
         # keep old histogram levels
@@ -92,11 +132,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.hist.setLevels(*hist_levels)
 
     def set_hist(self):
-        # tie new ImateItem
-        img = self.view_box.get_image()
-        self.hist.setImageItem(img)
+        img = self.dset[self.idx]
+        self.view_box.set_image(img)
 
-        # set auto range on
+        self.hist.setImageItem(self.view_box.img)
         self.hist.autoHistogramRange()
 
     def make_class_list_item(self, label: str, color: QColor) -> None:
@@ -134,28 +173,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # update the label text
         self.view_box.label = item.text()
-
-    def load(self) -> Path:
-        # get directory for loading content from a folder
-        fname = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        return Path(fname)
-
-    def save(self) -> Path:
-        # directory and filename for saving annotation data in json format
-        cwd = os.getcwd()
-        fname = QFileDialog.getSaveFileName(self, "Save file", cwd, "JSON files (*.json)")
-        return Path(fname[0])
-
-    def load_images(self) -> None:
-        # get file directory
-        fname = self.load()
-
-        if fname is not None:
-            # set image from view_box
-            self.view_box.load_images(fname)
-
-            # init histogram
-            self.set_hist()
     
     def load_annot(self) -> None:
         # get filename for annotation
@@ -171,8 +188,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_box.load_annot(data)
 
         # update class label list
-        label_dict = annot_to_label(data)
-        self.update_label_list(label_dict)
+        # label_dict = annot_to_label(data)
+        # self.update_label_list(label_dict)
 
     def update_label_list(self, label_dict: dict) -> None:
         
