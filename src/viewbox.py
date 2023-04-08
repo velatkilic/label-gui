@@ -7,6 +7,7 @@ class ViewBox(pg.ViewBox):
         super().__init__(*args, **kargs)
 
         self.img = None
+        self.label_mode = "segmentation"
 
         # bounding box data
         self.pen = pg.mkPen(width=1, color='r')
@@ -35,24 +36,22 @@ class ViewBox(pg.ViewBox):
         return roi
 
     def mouseClickEvent(self, event: QMouseEvent) -> None:
-        # left button for drawing bounding boxes
-        if event.button() == Qt.LeftButton:
+        pos = self.mapSceneToView(event.pos())
 
-            # map coordinates
-            # TODO: coordinates are off
-            pos = self.mapSceneToView(event.pos())
-            
+        if event.button() == Qt.LeftButton:
             # draw roi
-            if self.drawing:
-                self.drawing = False
-                self.end = pos
-                roi = self.make_roi(self.start, self.end)
-                self.add_roi_to_list(roi)
-                self.removeItem(self.prev_roi)
-                self.prev_roi = None
-            else:
-                self.drawing = True
-                self.start = pos
+            if self.label_mode == "bbox":
+                if self.drawing:
+                    self.drawing = False
+                    self.end = pos
+                    roi = self.make_roi(self.start, self.end)
+                    self.removeItem(self.prev_roi)
+                    self.prev_roi = None
+                else:
+                    self.drawing = True
+                    self.start = pos
+            elif self.label_mode == "segmentation":
+                pass
 
     def hoverEvent(self, event):
         # show bounding box while drawing is on

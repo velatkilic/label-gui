@@ -82,6 +82,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.last_dir = os.path.dirname(fname)
             self.idx = 0
             self.set_hist()
+    
+    def load_annot(self):
+        pass
 
     def save(self) -> Path:
         # directory and filename for saving annotation data in json format
@@ -92,14 +95,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def label_mode_segmentation(self):
         self.label_mode = "segmentation"
         self.spinBox_mask_scale.setEnabled(True)
+        self.view_box.label_mode = self.label_mode
 
     def label_mode_bbox(self):
         self.label_mode = "bbox"
         self.spinBox_mask_scale.setEnabled(False)
+        self.view_box.label_mode = self.label_mode
 
     def label_mode_off(self):
         self.label_mode = "off"
         self.spinBox_mask_scale.setEnabled(False)
+        self.view_box.label_mode = self.label_mode
 
     def prev(self):
         if len(self.dset) > 0:
@@ -152,19 +158,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_list.addItem(item)
 
     def add_class(self) -> None:
-        # color dialog for picking pen color
+        # color dialog for label
         color = QColorDialog().getColor()
         
         # text box for the class label
         text = self.class_label.text()
         self.view_box.label = text
-
-        # create and assign pen
-        self.view_box.pen = pg.mkPen(width=1, color=color)
-        self.view_box.pens.append(self.view_box.pen)
-
-        # create list widget item using the selected color
-        self.make_class_list_item(text, color)
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         # pick the correct pen
@@ -173,37 +172,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # update the label text
         self.view_box.label = item.text()
-    
-    def load_annot(self) -> None:
-        # get filename for annotation
-        cwd = os.getcwd()
-        fname = QFileDialog.getOpenFileName(self, "Open file", cwd, "JSON files (*.json)")
-        fname = Path(fname[0])
-
-        # load annotation data
-        with open(fname, "r") as file:
-            data = json.load(file)
-
-        # create and set rois in viewbox
-        self.view_box.load_annot(data)
-
-        # update class label list
-        # label_dict = annot_to_label(data)
-        # self.update_label_list(label_dict)
-
-    def update_label_list(self, label_dict: dict) -> None:
-        
-        for label, rgb in label_dict.items():
-            
-            # make color object
-            color = pg.mkColor(rgb)
-            
-            # create and assign pen
-            self.view_box.pen = pg.mkPen(width=1, color=color)
-            self.view_box.pens.append(self.view_box.pen)
-            
-            # create list widget item using the selected color
-            self.make_class_list_item(label, color)
 
     def save_annot(self) -> None:
         # get directory and filename for saving annotations
@@ -217,6 +185,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.prev()
         elif event.key() == Qt.Key_Right:
             self.next()
+        elif event.key() == Qt.Key_Space:
+            print("space")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
