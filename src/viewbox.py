@@ -22,6 +22,9 @@ class ViewBox(pg.ViewBox):
         self.circle = None
         self.alpha = 0.5
         self.mask_scale = 1
+        
+        self.current_points = None
+        self.current_labels = None
 
         self.dset = Dataset()
         self.model = Model()
@@ -73,26 +76,38 @@ class ViewBox(pg.ViewBox):
     def current_label_changed(self, class_label):
         self.class_label = class_label
 
+    def add_points(self, pos, input_label):
+        if self.current_points is None:
+            self.current_points = np.array([[pos.x(), pos.y()]])
+        else:
+            self.current_points = np.vstack((self.current_points,
+                                            np.array([[pos.x(), pos.y()]])))
+
+        if self.current_labels is None:
+            self.current_labels = np.array([input_label])
+        else:
+            self.current_labels = np.append(self.current_labels, input_label)
+
+        masks, scores, logits = self.model.predict(input_point=self.current_points,
+                                                   input_label=self.current_labels)
+        
+        mask = masks[self.mask_scale,:,:]
+        mask = mask[None,:,:]
+
+        img = self.dset[self.idx]
+        img = draw_segmentation_masks(img, mask, self.alpha)
+        self.clear_qt_objects()
+        self.img = pg.ImageItem(img)
+        self.addItem(self.img)
+
     def mouseClickEvent(self, event: QMouseEvent) -> None:
         pos = self.calc_pos(event.pos())
         
         if self.label_mode == "mask_on":
             if event.button() == Qt.LeftButton:
-                input_point = np.array([[pos.x(), pos.y()]])
-                input_label = np.array([1]) # foreground
-                masks, scores, logits = self.model.predict(input_point=input_point,
-                                                           input_label=input_label)
-                
-                mask = masks[self.mask_scale,:,:]
-                mask = mask[None,:,:]
-
-                img = self.dset[self.idx]
-                img = draw_segmentation_masks(img, mask, self.alpha)
-                self.clear_qt_objects()
-                self.img = pg.ImageItem(img)
-                self.addItem(self.img)
+                self.add_points(pos, input_label=1) # 1 = foreground
             elif event.button() == Qt.RightButton:
-                print("remove point", pos)
+                self.add_points(pos, input_label=0) # 0 = background
     
     def hoverEvent(self, event: QMouseEvent):
         if self.img is not None:
@@ -110,3 +125,8 @@ class ViewBox(pg.ViewBox):
             return pos
         except:
             return QPoint(0,0)
+    
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            self.current_points = None
+            self.current_labels = None
