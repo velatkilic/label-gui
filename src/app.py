@@ -64,12 +64,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def load_images(self) -> None:
         fname = QFileDialog.getExistingDirectory(self, 'Select Folder', str(self.last_dir))
+        self.last_dir = os.path.dirname(fname)
         self.view_box.load_images(fname)
         self.update_frame_id()
         self.set_hist()
     
     def load_video(self):
         fname = QFileDialog.getOpenFileName(self, "Select Video File", str(self.last_dir), "Video Files (*.mp4; *.avi)")[0]
+        self.last_dir = os.path.dirname(fname)
         self.view_box.load_video(fname)
         self.update_frame_id()
         self.set_hist()

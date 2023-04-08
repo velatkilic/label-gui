@@ -4,6 +4,12 @@ import imageio
 from skimage.io import imread_collection
 import glob
 
+IMG_TYPES = set(["rgb", "gif", "pbm","pgm","ppm","tif","tiff","rast","xbm","jpeg","jpg","bmp","png","webp","exr"])
+
+def check_if_image(ext):
+    ext = ext.split(".")[-1]
+    return ext in IMG_TYPES
+
 class Dataset:
     def __init__(self, video_name=None, image_folder=None):
         self.imgs = []
@@ -24,6 +30,7 @@ class Dataset:
 
     def set_image_folder(self, image_folder):
         img_files = glob.glob(os.path.join(image_folder, "*"))
+        img_files = list(filter(check_if_image, img_files))
         self.reader = imread_collection(img_files, conserve_memory=True)
         self.is_video = False
         self.length = len(self.reader)
