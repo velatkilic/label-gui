@@ -1,69 +1,86 @@
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
+import os
+from pathlib import Path
+from dataset import Dataset
+from model import Model
 
 class ViewBox(pg.ViewBox):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
+        self.idx = 0
         self.img = None
-        self.label_mode = "segmentation"
+        self.label_mode = "mask_on"
+        self.class_label = "unspecified"
+        self.class_color_dict = {}
+        self.circle = None
 
-        # bounding box data
-        self.pen = pg.mkPen(width=1, color='r')
-        self.drawing = False
-        self.start = None
-        self.end = None
-        self.prev_roi = None
+        self.dset = Dataset()
+        # self.model = Model()
 
-    def set_image(self, img) -> None:
-        self.img = pg.ImageItem(img)
+    def load_images(self, fname):
+        if len(fname):
+            fname = Path(fname)
+            self.dset.set_image_folder(fname)
+            self.last_dir = os.path.dirname(fname)
+            self.idx = 0
+            self.set_image()
+
+    def load_video(self, fname):
+        if len(fname) > 0:
+            fname = Path(fname)
+            self.dset.set_video_name(fname)
+            self.last_dir = os.path.dirname(fname)
+            self.idx = 0
+            self.set_image()
+    
+    def navigate_to_idx(self, idx):
+        if len(self.dset) > 0:
+            self.idx = idx
+            self.set_image()
+
+    def prev(self):
+        return (self.idx - 1) % len(self.dset)
+
+    def next(self):
+        return (self.idx + 1) % len(self.dset)
+
+    def set_image(self) -> None:
         self.clear() # clear current contents
+        img = self.dset[self.idx]
+        self.img = pg.ImageItem(img)
         self.addItem(self.img) # show current image
 
-    def make_roi(self, start: QPoint, end: QPoint):
-        # width and height
-        w = end.x() - start.x()
-        h = end.y() - start.y()
-
-        # make roi 
-        roi = pg.RectROI(start, [w, h], pen=self.pen, removable=True, rotatable=False)    
-        self.addItem(roi)
-
-        # removing roi from context menu
-        roi.sigRemoveRequested.connect(self.removeItem)
-        
-        return roi
+    def set_class_label(self, class_label, color):
+        self.class_label = class_label
+        self.class_color_dict[class_label] = color
+    
+    def current_label_changed(self, class_label):
+        self.class_label = class_label
 
     def mouseClickEvent(self, event: QMouseEvent) -> None:
-        pos = self.mapSceneToView(event.pos())
-
-        if event.button() == Qt.LeftButton:
-            # draw roi
-            if self.label_mode == "bbox":
-                if self.drawing:
-                    self.drawing = False
-                    self.end = pos
-                    roi = self.make_roi(self.start, self.end)
-                    self.removeItem(self.prev_roi)
-                    self.prev_roi = None
-                else:
-                    self.drawing = True
-                    self.start = pos
-            elif self.label_mode == "segmentation":
-                pass
-
-    def hoverEvent(self, event):
-        # show bounding box while drawing is on
-        if self.drawing:
-            # delete previous bounding box
-            if self.prev_roi is not None:
-                self.removeItem(self.prev_roi)
-            
-            # get current mouse position
-            pos = self.mapSceneToView(event.pos())
-
-            # visual feedback
-            # set current as end and draw a bounding box
-            roi = self.make_roi(self.start, pos)
-            self.prev_roi = roi
+        pos = self.calc_pos(event.pos())
+        if self.label_mode == "mask_on":
+            if event.button() == Qt.LeftButton:
+                print("add point", pos)
+            elif event.button() == Qt.RightButton:
+                print("remove point", pos)
+    
+    def hoverEvent(self, event: QMouseEvent):
+        if self.img is not None:
+            pos = self.calc_pos(event.pos())
+            if self.circle is not None:
+                self.removeItem(self.circle)
+            self.circle = pg.CircleROI(pos, radius=.1)
+            self.addItem(self.circle)
+    
+    def calc_pos(self, pos, offset=1):
+        try:
+            pos = self.mapSceneToView(pos)
+            pos.setX(pos.x() + offset)
+            pos.setY(pos.y() + offset)
+            return pos
+        except:
+            return QPoint(0,0)
