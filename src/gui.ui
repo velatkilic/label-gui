@@ -77,10 +77,13 @@
           <item>
            <widget class="QSpinBox" name="spinBox_mask_scale">
             <property name="minimum">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="maximum">
-             <number>3</number>
+             <number>2</number>
+            </property>
+            <property name="value">
+             <number>0</number>
             </property>
            </widget>
           </item>

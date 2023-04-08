@@ -1,10 +1,14 @@
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
+
+import numpy as np
 import os
 from pathlib import Path
+
 from dataset import Dataset
-from model import Model
+from model import Model, Annotation
+from utils import draw_segmentation_masks
 
 class ViewBox(pg.ViewBox):
     def __init__(self, *args, **kargs):
@@ -16,9 +20,17 @@ class ViewBox(pg.ViewBox):
         self.class_label = "unspecified"
         self.class_color_dict = {}
         self.circle = None
+        self.alpha = 0.5
+        self.mask_scale = 1
 
         self.dset = Dataset()
-        # self.model = Model()
+        self.model = Model()
+        self.annot = Annotation()
+
+    def clear_qt_objects(self):
+        self.clear()
+        self.circle = None
+        self.img = None
 
     def load_images(self, fname):
         if len(fname):
@@ -48,8 +60,9 @@ class ViewBox(pg.ViewBox):
         return (self.idx + 1) % len(self.dset)
 
     def set_image(self) -> None:
-        self.clear() # clear current contents
+        self.clear_qt_objects() # clear current contents
         img = self.dset[self.idx]
+        self.model.set_image(img)
         self.img = pg.ImageItem(img)
         self.addItem(self.img) # show current image
 
@@ -62,9 +75,22 @@ class ViewBox(pg.ViewBox):
 
     def mouseClickEvent(self, event: QMouseEvent) -> None:
         pos = self.calc_pos(event.pos())
+        
         if self.label_mode == "mask_on":
             if event.button() == Qt.LeftButton:
-                print("add point", pos)
+                input_point = np.array([[pos.x(), pos.y()]])
+                input_label = np.array([1]) # foreground
+                masks, scores, logits = self.model.predict(input_point=input_point,
+                                                           input_label=input_label)
+                
+                mask = masks[self.mask_scale,:,:]
+                mask = mask[None,:,:]
+
+                img = self.dset[self.idx]
+                img = draw_segmentation_masks(img, mask, self.alpha)
+                self.clear_qt_objects()
+                self.img = pg.ImageItem(img)
+                self.addItem(self.img)
             elif event.button() == Qt.RightButton:
                 print("remove point", pos)
     

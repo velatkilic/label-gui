@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_mode = "mask_on"
         self.radio_mask_on.clicked.connect(self.label_mode_on)
         self.radio_mask_off.clicked.connect(self.label_mode_off)
+        self.spinBox_mask_scale.valueChanged.connect(self.mask_scale)
 
         # view_box holds images
         self.view_box = ViewBox(lockAspect=True, invertY=True)
@@ -116,6 +117,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def set_hist(self):
         self.hist.setImageItem(self.view_box.img)
         self.hist.autoHistogramRange()
+
+    def mask_scale(self, mask_scale):
+        self.view_box.mask_scale = mask_scale
 
     def make_class_list_item(self, label: str, color: QColor) -> None:
         item = QListWidgetItem(label)
