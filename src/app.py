@@ -32,7 +32,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.last_dir = Path(os.getcwd())
 
         # label mode
-        self.label_mode = "mask_on"
         self.radio_mask_on.clicked.connect(self.label_mode_on)
         self.radio_mask_off.clicked.connect(self.label_mode_off)
         self.spinBox_mask_scale.valueChanged.connect(self.mask_scale)
@@ -88,14 +87,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # TODO
 
     def label_mode_on(self):
-        self.label_mode = "mask_on"
         self.spinBox_mask_scale.setEnabled(True)
-        self.view_box.label_mode = self.label_mode
+        self.view_box.set_label_mode("mask_on")
 
     def label_mode_off(self):
-        self.label_mode = "off"
         self.spinBox_mask_scale.setEnabled(False)
-        self.view_box.label_mode = self.label_mode
+        self.view_box.set_label_mode("off")
 
     def navigate_to_idx(self, idx):
         self.view_box.navigate_to_idx(idx)

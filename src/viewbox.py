@@ -16,15 +16,19 @@ class ViewBox(pg.ViewBox):
 
         self.idx = 0
         self.img = None
-        self.label_mode = "mask_on"
+        self.label_mode = "off"
         self.class_label = "unspecified"
         self.class_color_dict = {}
         self.circle = None
         self.alpha = 0.5
         self.mask_scale = 1
         
+        # model inputs and outputs
         self.current_points = None
         self.current_labels = None
+        self.current_masks = None
+        self.current_scores = None
+        self.current_logits = None
 
         self.dset = Dataset()
         self.model = Model()
@@ -65,9 +69,15 @@ class ViewBox(pg.ViewBox):
     def set_image(self) -> None:
         self.clear_qt_objects() # clear current contents
         img = self.dset[self.idx]
-        self.model.set_image(img)
+        if self.label_mode == "mask_on":
+            self.model.set_image(img)
         self.img = pg.ImageItem(img)
         self.addItem(self.img) # show current image
+    
+    def set_label_mode(self, label_mode):
+        self.label_mode = label_mode
+        if label_mode == "mask_on":
+            self.set_image()
 
     def set_class_label(self, class_label, color):
         self.class_label = class_label
@@ -88,11 +98,20 @@ class ViewBox(pg.ViewBox):
         else:
             self.current_labels = np.append(self.current_labels, input_label)
 
+        self.update_annot()
+
+    def update_annot(self):
         masks, scores, logits = self.model.predict(input_point=self.current_points,
                                                    input_label=self.current_labels)
-        
-        mask = masks[self.mask_scale,:,:]
+        self.current_masks = masks
+        self.current_scores = scores
+        self.current_logits = logits
+
+        mask = masks[self.mask_scale, :, :]
         mask = mask[None,:,:]
+        prev_masks = self.annot.get_mask(self.idx)
+        if prev_masks is not None:
+            mask = np.vstack((prev_masks[:,0,...], mask))
 
         img = self.dset[self.idx]
         img = draw_segmentation_masks(img, mask, self.alpha)
@@ -110,7 +129,7 @@ class ViewBox(pg.ViewBox):
                 self.add_points(pos, input_label=0) # 0 = background
     
     def hoverEvent(self, event: QMouseEvent):
-        if self.img is not None:
+        if self.img is not None and self.label_mode == "mask_on":
             pos = self.calc_pos(event.pos())
             if self.circle is not None:
                 self.removeItem(self.circle)
@@ -128,5 +147,15 @@ class ViewBox(pg.ViewBox):
     
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
+            self.annot.add_annotation(self.idx,
+                                      self.current_masks,
+                                      self.mask_scale,
+                                      self.current_scores,
+                                      self.current_logits)
             self.current_points = None
             self.current_labels = None
+            self.current_masks = None
+            self.current_scores = None
+            self.current_logits = None
+        
+        event.ignore()

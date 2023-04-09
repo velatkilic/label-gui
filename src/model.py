@@ -1,3 +1,4 @@
+import numpy as np
 import os
 from pathlib import Path
 from segment_anything import sam_model_registry, SamPredictor
@@ -27,9 +28,29 @@ class Model:
 
 class Annotation:
     def __init__(self) -> None:
-        self.masks = []
-        self.scores = []
-        self.logits = []
-        self.labels = []
+        self.masks = {}
+        self.mask_scale = {}
+        self.scores = {}
+        self.logits = {}
+        self.labels = {}
+        self.colors = {}
     
-    
+    def add_annotation(self, frame_id, mask, mask_scale, score, logit):
+        if frame_id in self.masks:
+            self.masks[frame_id].append(mask)
+            self.mask_scale[frame_id].append(mask_scale)
+            self.scores[frame_id].append(score)
+            self.logits[frame_id].append(logit)
+        else:
+            self.masks[frame_id] = [mask]
+            self.mask_scale[frame_id] = [mask_scale]
+            self.scores[frame_id] = [score]
+            self.logits[frame_id] = [logit]
+
+    def get_mask(self, frame_id):
+        if frame_id in self.masks:
+            mask_scale = self.mask_scale[frame_id]
+            masks = np.array(self.masks[frame_id])
+            return masks[:,mask_scale,:,:]
+        else:
+            return None
