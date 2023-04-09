@@ -8,7 +8,7 @@ from pathlib import Path
 
 from dataset import Dataset
 from model import Model, Annotation
-from utils import draw_segmentation_masks
+from utils import draw_segmentation_masks, make_new_color
 
 class ViewBox(pg.ViewBox):
     def __init__(self, *args, **kargs):
@@ -18,7 +18,7 @@ class ViewBox(pg.ViewBox):
         self.img = None
         self.label_mode = "off"
         self.class_label = "unspecified"
-        self.class_color_dict = {}
+        self.class_color_dict = {"unspecified": np.array([359, 255, 100])}
         self.circle = None
         self.alpha = 0.5
         self.mask_scale = 1
@@ -30,6 +30,7 @@ class ViewBox(pg.ViewBox):
         self.current_masks = None
         self.current_scores = None
         self.current_logits = None
+        self.current_color = None
 
         self.dset = Dataset()
         self.model = Model()
@@ -66,6 +67,9 @@ class ViewBox(pg.ViewBox):
 
     def next(self):
         return (self.idx + 1) % len(self.dset)
+
+    def get_img(self):
+        return self.dset[self.idx]
 
     def set_image(self) -> None:
         self.clear_qt_objects() # clear current contents
@@ -119,8 +123,15 @@ class ViewBox(pg.ViewBox):
         if prev_masks is not None:
             mask = np.vstack((prev_masks[:,0,...], mask))
 
+        self.current_color = make_new_color(self.class_color_dict[self.class_label])
+        colors = self.annot.get_color(self.idx)
+        if colors is None:
+            colors = [self.current_color]
+        else:
+            colors.append(self.current_color)
+
         img = self.dset[self.idx]
-        img = draw_segmentation_masks(img, mask, self.alpha)
+        img = draw_segmentation_masks(img, mask, self.alpha, colors)
         self.img_annot = img
         self.clear_qt_objects()
         self.img = pg.ImageItem(img)
@@ -164,6 +175,7 @@ class ViewBox(pg.ViewBox):
         self.current_masks = None
         self.current_scores = None
         self.current_logits = None
+        self.current_color = None
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
@@ -171,7 +183,9 @@ class ViewBox(pg.ViewBox):
                                       self.current_masks,
                                       self.mask_scale,
                                       self.current_scores,
-                                      self.current_logits)
+                                      self.current_logits,
+                                      self.current_color,
+                                      self.class_label)
             self.annot.set_image(self.idx, self.img_annot)
             self.reset_current_annot()
         

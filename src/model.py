@@ -36,23 +36,33 @@ class Annotation:
         self.colors = {}
         self.imgs = {}
     
-    def add_annotation(self, frame_id, mask, mask_scale, score, logit):
+    def add_annotation(self, frame_id, mask, mask_scale, score, logit, color, label):
         if frame_id in self.masks:
             self.masks[frame_id].append(mask)
             self.mask_scale[frame_id].append(mask_scale)
             self.scores[frame_id].append(score)
             self.logits[frame_id].append(logit)
+            self.colors[frame_id].append(color)
+            self.labels[frame_id].append(label)
         else:
             self.masks[frame_id] = [mask]
             self.mask_scale[frame_id] = [mask_scale]
             self.scores[frame_id] = [score]
             self.logits[frame_id] = [logit]
+            self.colors[frame_id] = [color]
+            self.labels[frame_id] = [label]
 
     def get_mask(self, frame_id):
         if frame_id in self.masks:
             mask_scale = self.mask_scale[frame_id]
             masks = np.array(self.masks[frame_id])
             return masks[:,mask_scale,:,:]
+        else:
+            return None
+
+    def get_color(self, frame_id):
+        if frame_id in self.colors:
+            return self.colors[frame_id]
         else:
             return None
 

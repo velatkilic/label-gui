@@ -1,3 +1,4 @@
+import numpy as np
 import sys
 import os
 from pathlib import Path
@@ -127,11 +128,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_list.addItem(item)
 
     def add_class(self) -> None:
-        color = QColorDialog().getColor()
+        img = self.view_box.get_img()
+        h = np.random.randint(0,359)
+        s = 255
+        if img is not None:
+            v = int(1.5*255 * img.mean() / img.max())
+        else:
+            v = 100
+        color = QColor()
+        color.setHsv(h, s, v)
+        # color = QColorDialog().getColor()
         text = self.class_label.text()
         self.make_class_list_item(text, color)
 
-        self.view_box.set_class_label(text, color)
+        self.view_box.set_class_label(text, color.value())
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())
