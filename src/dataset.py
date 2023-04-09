@@ -3,6 +3,7 @@ import os
 import imageio
 from skimage.io import imread_collection
 import glob
+from utils import normalize
 
 IMG_TYPES = set(["rgb", "gif", "pbm","pgm","ppm","tif","tiff","rast","xbm","jpeg","jpg","bmp","png","webp","exr"])
 
@@ -11,11 +12,12 @@ def check_if_image(ext):
     return ext in IMG_TYPES
 
 class Dataset:
-    def __init__(self, video_name=None, image_folder=None):
+    def __init__(self, video_name=None, image_folder=None, normalize_img=True):
         self.imgs = []
         self.length = 0
         self.is_video = False
         self.reader = None
+        self.normalize_img = normalize_img
         
         if video_name is not None:
             self.set_video_name(video_name)
@@ -50,6 +52,13 @@ class Dataset:
         else:
             img = np.array(self.reader[idx])
         
+        if self.normalize_img:
+            img = 255. * normalize(img)
+            img = img.astype(np.uint8)
+
+        if len(img.shape) < 3:
+            img = np.repeat(img[:,:, None], 3, axis=2)
+
         # cache the result
         self.imgs[idx] = img
         return img

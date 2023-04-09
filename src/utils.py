@@ -20,18 +20,25 @@ def hsv_to_rgb(hsv):
     return rgb
 
 def draw_segmentation_masks(img, masks, alpha, colors=None):
+    img = 255. * normalize(img) # in case img has more than 8 bits
     n_masks = len(masks)
+    if n_masks == 0: return img
     if colors is None:
-        colors = np.random.randint(0, 255, size=(n_masks, 3))
+        h = np.random.randint(0, 359, size=(n_masks, 1))
+        s = 255.*np.ones((n_masks,1)) #np.random.randint(100, 255, size=(n_masks, 1))
+        v = img.mean() * np.ones((n_masks, 1))
+        colors = np.hstack((h,s,v))
     
     mask = np.zeros(img.shape)
     for i, m in enumerate(masks):
         m = normalize(m)
         m = m[:,:,None] * hsv_to_rgb(colors[i])
         mask += m
-    mask /= n_masks
-
-    return img*alpha + mask*(1-alpha)
+    mask = np.clip(mask, 0, 255)
+    mask_bool = np.bitwise_or.reduce(masks, axis=0)
+    img[mask_bool] = img[mask_bool]*alpha + mask[mask_bool]*(1-alpha)
+                                                 
+    return img
 
 def make_new_color(seed_color, a=20, b=5):
     h, s, v = seed_color

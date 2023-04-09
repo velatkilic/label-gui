@@ -7,13 +7,11 @@ import json
 from gui import Ui_MainWindow
 from viewbox import ViewBox
 
-from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication,
                             QMainWindow,
                             QFileDialog,
                             QListWidgetItem,
-                            QColorDialog,
                             )
 import pyqtgraph as pg
 
@@ -38,7 +36,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spinBox_mask_scale.valueChanged.connect(self.mask_scale)
 
         # view_box holds images
-        self.view_box = ViewBox(lockAspect=True, invertY=True)
+        self.view_box = ViewBox(self, lockAspect=True, invertY=True)
         self.hist = pg.HistogramLUTItem()
         self.img_view.addItem(self.view_box, row=0, col=0, rowspan=1, colspan=1)
         self.img_view.addItem(self.hist, row=0, col=1, rowspan=1, colspan=1)
@@ -119,29 +117,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def mask_scale(self, mask_scale):
         self.view_box.mask_scale = mask_scale
 
-    def make_class_list_item(self, label: str, color: QColor) -> None:
-        item = QListWidgetItem(label)
+    def add_class(self) -> None:
+        text = self.class_label.text()
+        item = QListWidgetItem(text)
         item.setFlags(item.flags() | Qt.ItemIsEditable)
-        item.setBackground(color)
 
         # add list widget item to the label list
         self.label_list.addItem(item)
 
-    def add_class(self) -> None:
-        img = self.view_box.get_img()
-        h = np.random.randint(0,359)
-        s = 255
-        if img is not None:
-            v = int(1.5*255 * img.mean() / img.max())
-        else:
-            v = 100
-        color = QColor()
-        color.setHsv(h, s, v)
-        # color = QColorDialog().getColor()
-        text = self.class_label.text()
-        self.make_class_list_item(text, color)
-
-        self.view_box.set_class_label(text, color.value())
+        self.view_box.set_class_label(text)
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())
