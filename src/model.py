@@ -34,6 +34,7 @@ class Annotation:
         self.logits = {}
         self.labels = {}
         self.colors = {}
+        self.imgs = {}
     
     def add_annotation(self, frame_id, mask, mask_scale, score, logit):
         if frame_id in self.masks:
@@ -54,3 +55,12 @@ class Annotation:
             return masks[:,mask_scale,:,:]
         else:
             return None
+
+    def get_image(self, frame_id):
+        if frame_id in self.imgs:
+            return self.imgs[frame_id]
+        else:
+            return None
+
+    def set_image(self, frame_id, img):
+        self.imgs[frame_id] = img

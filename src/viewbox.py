@@ -22,6 +22,7 @@ class ViewBox(pg.ViewBox):
         self.circle = None
         self.alpha = 0.5
         self.mask_scale = 1
+        self.image_annot = None
         
         # model inputs and outputs
         self.current_points = None
@@ -71,7 +72,12 @@ class ViewBox(pg.ViewBox):
         img = self.dset[self.idx]
         if self.label_mode == "mask_on":
             self.model.set_image(img)
-        self.img = pg.ImageItem(img)
+        
+        img_annot = self.annot.get_image(self.idx)
+        if self.label_mode == "mask_on" and img_annot is not None:
+            self.img = pg.ImageItem(img_annot)
+        else:
+            self.img = pg.ImageItem(img)
         self.addItem(self.img) # show current image
     
     def set_label_mode(self, label_mode):
@@ -115,13 +121,17 @@ class ViewBox(pg.ViewBox):
 
         img = self.dset[self.idx]
         img = draw_segmentation_masks(img, mask, self.alpha)
+        self.img_annot = img
         self.clear_qt_objects()
         self.img = pg.ImageItem(img)
         self.addItem(self.img)
 
     def mouseClickEvent(self, event: QMouseEvent) -> None:
-        pos = self.calc_pos(event.pos())
-        
+        try:
+            pos = self.calc_pos(event.pos())
+        except:
+            pos = QPoint(0,0)
+
         if self.label_mode == "mask_on":
             if event.button() == Qt.LeftButton:
                 self.add_points(pos, input_label=1) # 1 = foreground
@@ -130,7 +140,10 @@ class ViewBox(pg.ViewBox):
     
     def hoverEvent(self, event: QMouseEvent):
         if self.img is not None and self.label_mode == "mask_on":
-            pos = self.calc_pos(event.pos())
+            try:
+                pos = self.calc_pos(event.pos())
+            except:
+                pos = QPoint(0, 0)
             if self.circle is not None:
                 self.removeItem(self.circle)
             self.circle = pg.CircleROI(pos, radius=.1)
@@ -145,6 +158,13 @@ class ViewBox(pg.ViewBox):
         except:
             return QPoint(0,0)
     
+    def reset_current_annot(self):
+        self.current_points = None
+        self.current_labels = None
+        self.current_masks = None
+        self.current_scores = None
+        self.current_logits = None
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
             self.annot.add_annotation(self.idx,
@@ -152,10 +172,11 @@ class ViewBox(pg.ViewBox):
                                       self.mask_scale,
                                       self.current_scores,
                                       self.current_logits)
-            self.current_points = None
-            self.current_labels = None
-            self.current_masks = None
-            self.current_scores = None
-            self.current_logits = None
+            self.annot.set_image(self.idx, self.img_annot)
+            self.reset_current_annot()
         
+        elif event.key() == Qt.Key_Escape:
+            self.reset_current_annot()
+            self.set_image()
+
         event.ignore()
