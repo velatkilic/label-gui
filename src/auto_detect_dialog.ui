@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>240</width>
-    <height>526</height>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -152,7 +152,7 @@
         <string>Mask prediction will be run again on crops of the image</string>
        </property>
        <property name="value">
-        <number>1</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -213,6 +213,36 @@
        </property>
        <property name="value">
         <double>0.700000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="statusTip">
+        <string>Threshold masks larger than this</string>
+       </property>
+       <property name="text">
+        <string>Max Mask Size</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBox_max_mask_region">
+       <property name="statusTip">
+        <string>Threshold masks larger than this</string>
+       </property>
+       <property name="maximum">
+        <number>999999999</number>
+       </property>
+       <property name="singleStep">
+        <number>1000</number>
+       </property>
+       <property name="value">
+        <number>10000</number>
        </property>
       </widget>
      </item>

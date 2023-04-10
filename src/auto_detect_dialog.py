@@ -18,6 +18,7 @@ class AutoDetectDialog(QDialog, Ui_Dialog):
             "crop_n_layers" : self.spinBox_crop_n_layers.value(),
             "crop_nms_thresh" : self.spinBox_crop_nms_threshold.value(),
             "crop_overlap_ratio" : self.spinBox_crop_overlap_ratio.value(),
-            "min_mask_region_area" : self.spinBox_min_mask_region.value()
+            "min_mask_region_area" : self.spinBox_min_mask_region.value(),
+            "max_mask_region": self.spinBox_max_mask_region.value()
         }
         return params
