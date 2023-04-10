@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 
 from gui import Ui_MainWindow
+from auto_detect_dialog import Ui_Dialog
 from viewbox import ViewBox
 
 from PyQt5.QtCore import Qt
@@ -29,6 +30,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # remember last directory for loading data
         self.last_dir = Path(os.getcwd())
+
+        # detection
+        self.button_auto_detect.clicked.connect(self.auto_detect)
 
         # label mode
         self.radio_mask_on.clicked.connect(self.label_mode_on)
@@ -56,6 +60,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
 
+    def auto_detect(self):
+        dialog = Ui_Dialog()
+        dialog.exec()
+        print("end")
+    
     def update_frame_id(self):
         frame_count = len(self.view_box.dset)
         self.label_frame_count.setText("/"+str(frame_count - 1))

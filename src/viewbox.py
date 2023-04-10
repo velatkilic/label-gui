@@ -8,7 +8,7 @@ from pathlib import Path
 
 from dataset import Dataset
 from model import Model, Annotation
-from utils import draw_segmentation_masks 
+from utils import draw_segmentation_masks
 
 class ViewBox(pg.ViewBox):
     def __init__(self, parent, *args, **kargs):
@@ -16,7 +16,7 @@ class ViewBox(pg.ViewBox):
         self.parent = parent
         self.idx = 0
         self.img = None
-        self.label_mode = "off"
+        self.label_mode = "mask_on"
         self.class_label = "unspecified"
         self.circle = None
         self.alpha = 0.5

@@ -40,6 +40,42 @@
        <enum>QLayout::SetFixedSize</enum>
       </property>
       <item>
+       <widget class="QPushButton" name="button_auto_detect">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Auto-Detect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="button_process_video">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Process Video</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="button_cluster">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Cluster Detections</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -48,21 +84,31 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QRadioButton" name="radio_mask_on">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="text">
-             <string>Mask On</string>
+             <string>Annotation On</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="radio_mask_off">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="text">
-             <string>Mask Off</string>
+             <string>Annotation Off</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -72,6 +118,11 @@
          <layout class="QHBoxLayout" name="horizontalLayout_mask_scale">
           <item>
            <widget class="QLabel" name="label_3">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Mask Scale</string>
             </property>
@@ -79,6 +130,11 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_mask_scale">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="minimum">
              <number>0</number>
             </property>
@@ -165,6 +221,11 @@
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Frame ID</string>
             </property>
@@ -172,6 +233,11 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_frame_id">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="maximum">
              <number>999999999</number>
             </property>
@@ -179,6 +245,11 @@
           </item>
           <item>
            <widget class="QLabel" name="label_frame_count">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>/0</string>
             </property>
