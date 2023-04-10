@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBox">
+      <widget class="QSpinBox" name="spinBox_points_per_side">
        <property name="statusTip">
         <string>Number of points to be sampled</string>
        </property>
@@ -57,7 +57,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+      <widget class="QDoubleSpinBox" name="spinBox_quality_threshold">
        <property name="statusTip">
         <string>Filtering using model's predicted mask quality</string>
        </property>
@@ -87,7 +87,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+      <widget class="QDoubleSpinBox" name="spinBox_stability_threshold">
        <property name="statusTip">
         <string>Mask stability threshold</string>
        </property>
@@ -117,7 +117,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+      <widget class="QDoubleSpinBox" name="spinBox_nms_threshold">
        <property name="statusTip">
         <string>Intersection over union threshold used for NMS</string>
        </property>
@@ -147,12 +147,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBox_2">
+      <widget class="QSpinBox" name="spinBox_crop_n_layers">
        <property name="statusTip">
         <string>Mask prediction will be run again on crops of the image</string>
        </property>
        <property name="value">
-        <number>2</number>
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -171,7 +171,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+      <widget class="QDoubleSpinBox" name="spinBox_crop_nms_threshold">
        <property name="statusTip">
         <string>Intersection over union threshold used for NMS to combine crops</string>
        </property>
@@ -201,7 +201,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+      <widget class="QDoubleSpinBox" name="spinBox_crop_overlap_ratio">
        <property name="statusTip">
         <string>crops will overlap by this fraction</string>
        </property>
@@ -231,7 +231,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBox_3">
+      <widget class="QSpinBox" name="spinBox_min_mask_region">
        <property name="statusTip">
         <string>Use this to remove disconnected regions and holes in masks unless set to 0.</string>
        </property>
@@ -255,7 +255,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBox_4">
+      <widget class="QSpinBox" name="spinBox_points_per_batch">
        <property name="statusTip">
         <string>number of points run simultaneously by the model. Higher numbers may be faster but use more GPU memory.</string>
        </property>

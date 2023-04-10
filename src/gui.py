@@ -84,7 +84,7 @@ class Ui_MainWindow(object):
         self.spinBox_mask_scale.setFont(font)
         self.spinBox_mask_scale.setMinimum(0)
         self.spinBox_mask_scale.setMaximum(2)
-        self.spinBox_mask_scale.setProperty("value", 0)
+        self.spinBox_mask_scale.setProperty("value", 1)
         self.spinBox_mask_scale.setObjectName("spinBox_mask_scale")
         self.horizontalLayout_mask_scale.addWidget(self.spinBox_mask_scale)
         self.verticalLayout_4.addLayout(self.horizontalLayout_mask_scale)

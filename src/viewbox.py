@@ -27,9 +27,6 @@ class ViewBox(pg.ViewBox):
         self.current_points = None
         self.current_labels = None
         self.current_masks = None
-        self.current_scores = None
-        self.current_logits = None
-        self.current_color = None
 
         self.dset = Dataset()
         self.model = Model()
@@ -39,6 +36,13 @@ class ViewBox(pg.ViewBox):
         self.clear()
         self.circle = None
         self.img = None
+
+    def auto_detect(self):
+        img = self.get_img()
+        annots = self.model.generate(img)
+        self.annot.add_auto_detect_annot(self.idx, annots)
+        masks = self.annot.get_mask(self.idx)
+        self.update_img_annot(masks)
 
     def load_images(self, fname):
         if len(fname):
@@ -112,16 +116,17 @@ class ViewBox(pg.ViewBox):
     def update_annot(self):
         masks, scores, logits = self.model.predict(input_point=self.current_points,
                                                    input_label=self.current_labels)
-        self.current_masks = masks
-        self.current_scores = scores
-        self.current_logits = logits
 
         mask = masks[self.mask_scale, :, :]
+        self.current_masks = mask
+        
         mask = mask[None,:,:]
         prev_masks = self.annot.get_mask(self.idx)
         if prev_masks is not None:
-            mask = np.vstack((prev_masks[:,0,...], mask))
+            mask = np.vstack((prev_masks, mask))
+        self.update_img_annot(mask)
 
+    def update_img_annot(self, mask):
         img = self.dset[self.idx]
         img = draw_segmentation_masks(img, mask, self.alpha)
         self.img_annot = img
@@ -174,9 +179,6 @@ class ViewBox(pg.ViewBox):
         if event.key() == Qt.Key_Space:
             self.annot.add_annotation(self.idx,
                                       self.current_masks,
-                                      self.mask_scale,
-                                      self.current_scores,
-                                      self.current_logits,
                                       self.class_label)
             self.annot.set_image(self.idx, self.img_annot)
             self.reset_current_annot()

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from pathlib import Path
-from segment_anything import sam_model_registry, SamPredictor
+from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskGenerator
 
 class Model:
     def __init__(self, sam_checkpoint = None, model_type="vit_h", device="cuda"):
@@ -11,12 +11,16 @@ class Model:
         self.sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
         self.sam.to(device=device)
         self.predictor = SamPredictor(self.sam)
+        self.auto_mask_generator = None
 
         self.img_shape = None
     
     def set_image(self, img):
         self.img_shape = img.shape
         self.predictor.set_image(img)
+
+    def set_auto_mask_generator(self, params):
+        self.auto_mask_generator = SamAutomaticMaskGenerator(model=self.sam, **params)
 
     def predict(self, input_point=None, input_label=None, input_mask=None, input_box=None):
         masks, scores, logits = self.predictor.predict(
@@ -26,42 +30,37 @@ class Model:
         )
         return masks, scores, logits
 
+    def generate(self, img):
+        return self.auto_mask_generator.generate(img)
+
 class Annotation:
     def __init__(self) -> None:
         self.masks = {}
-        self.mask_scale = {}
-        self.scores = {}
-        self.logits = {}
         self.labels = {}
         self.imgs = {}
     
-    def add_annotation(self, frame_id, mask, mask_scale, score, logit, label):
+    def add_annotation(self, frame_id, mask, label):
         if mask is None:
             return
         elif frame_id in self.masks:
             self.masks[frame_id].append(mask)
-            self.mask_scale[frame_id].append(mask_scale)
-            self.scores[frame_id].append(score)
-            self.logits[frame_id].append(logit)
             self.labels[frame_id].append(label)
         else:
             self.masks[frame_id] = [mask]
-            self.mask_scale[frame_id] = [mask_scale]
-            self.scores[frame_id] = [score]
-            self.logits[frame_id] = [logit]
             self.labels[frame_id] = [label]
+
+    def add_auto_detect_annot(self, frame_id, annots):
+        masks = []
+        label = ["unspecified",] * len(annots)
+        for annot in annots:
+            masks.append(annot["segmentation"])
+        
+        self.masks[frame_id] = masks
+        self.labels[frame_id] = label
 
     def get_mask(self, frame_id):
         if frame_id in self.masks:
-            mask_scale = self.mask_scale[frame_id]
-            masks = np.array(self.masks[frame_id])
-            return masks[:,mask_scale,:,:]
-        else:
-            return None
-
-    def get_color(self, frame_id):
-        if frame_id in self.colors:
-            return self.colors[frame_id]
+            return np.array(self.masks[frame_id])
         else:
             return None
 

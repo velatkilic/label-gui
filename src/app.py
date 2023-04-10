@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 
 from gui import Ui_MainWindow
-from auto_detect_dialog import Ui_Dialog
+from auto_detect_dialog import AutoDetectDialog
 from viewbox import ViewBox
 
 from PyQt5.QtCore import Qt
@@ -61,9 +61,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_next.clicked.connect(self.next)
 
     def auto_detect(self):
-        dialog = Ui_Dialog()
+        dialog = AutoDetectDialog()
         dialog.exec()
-        print("end")
+        auto_detect_params = dialog.get_params()
+        self.view_box.model.set_auto_mask_generator(auto_detect_params)
+        self.view_box.auto_detect()
     
     def update_frame_id(self):
         frame_count = len(self.view_box.dset)
