@@ -28,6 +28,8 @@ class ViewBox(pg.ViewBox):
         self.current_labels = None
         self.current_masks = None
 
+        self.last_selected_id = None
+
         self.dset = Dataset()
         self.model = Model()
         self.annot = Annotation()
@@ -97,6 +99,8 @@ class ViewBox(pg.ViewBox):
         self.show_mask_mode = show_mode
         if show_mode == "all":
             self.show_mask_all()
+        elif self.last_selected_id is not None:
+                self.show_mask_by_id(self.last_selected_id)
 
     def set_label_mode(self, label_mode):
         self.label_mode = label_mode
@@ -189,9 +193,6 @@ class ViewBox(pg.ViewBox):
         self.current_points = None
         self.current_labels = None
         self.current_masks = None
-        self.current_scores = None
-        self.current_logits = None
-        self.current_color = None
     
     def add_to_annot_list(self):
         masks = self.annot.get_mask(self.idx)

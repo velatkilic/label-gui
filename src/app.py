@@ -141,10 +141,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def mask_scale(self, mask_scale):
         self.view_box.mask_scale = mask_scale
 
-    def add_mask(self, id):
-        text = "Mask " + str(id)
+    def add_mask(self, idx):
+        text = "Mask " + str(idx)
         item = QListWidgetItem(text)
         self.annot_list.addItem(item)
+        self.view_box.last_selected_id = idx - 1
 
     def add_class(self) -> None:
         text = self.class_label.text()
@@ -159,7 +160,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def current_annot_changed(self, item: QListWidgetItem):
         mask_text = item.text()
         idx = int(mask_text.split()[-1]) - 1
-        self.view_box.show_mask_by_id(idx)
+        if self.view_box.show_mask_mode == "last":
+            self.view_box.show_mask_by_id(idx)
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())
