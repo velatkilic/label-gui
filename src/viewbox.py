@@ -17,6 +17,7 @@ class ViewBox(pg.ViewBox):
         self.idx = 0
         self.img = None
         self.label_mode = "off"
+        self.show_mask_mode = "last"
         self.class_label = "unspecified"
         self.circle = None
         self.alpha = 0.5
@@ -42,7 +43,7 @@ class ViewBox(pg.ViewBox):
         self.annot.add_auto_detect_annot(self.idx, annots)
         masks = self.annot.get_mask(self.idx)
         self.update_img_annot(masks)
-        self.update_annot_list()
+        for i in range(len(masks)): self.parent.add_mask(i)
 
     def load_images(self, fname):
         if len(fname):
@@ -77,27 +78,44 @@ class ViewBox(pg.ViewBox):
     def set_image(self) -> None:
         self.clear_qt_objects() # clear current contents
         img = self.dset[self.idx]
-        if self.label_mode == "on":
-            self.model.set_image(img)
         
-        img_annot = self.annot.get_image(self.idx)
-        if self.label_mode == "on" and img_annot is not None:
-            self.img = pg.ImageItem(img_annot)
-        else:
-            self.img = pg.ImageItem(img)
+        if self.label_mode == "on":
+            # if embedding cached use that instead,
+            # else, compute and cache embedding
+            if self.idx in self.annot.img_embed:
+                self.model.set_cached_img_embed(self.annot.img_embed[self.idx])
+            else:
+                self.model.set_image(img)
+                img_embed = self.model.get_img_embed()
+                self.annot.add_img_embed(self.idx, img_embed)
+        
+        self.img = pg.ImageItem(img)
         self.addItem(self.img) # show current image
         self.parent.update_hist()
     
+    def set_show_mask_mode(self, show_mode):
+        self.show_mask_mode = show_mode
+        if show_mode == "all":
+            self.show_mask_all()
+
     def set_label_mode(self, label_mode):
         self.label_mode = label_mode
-        if label_mode == "on":
-            self.set_image()
+        self.set_image()
 
     def set_class_label(self, class_label):
         self.class_label = class_label
     
     def current_label_changed(self, class_label):
         self.class_label = class_label
+
+    def show_mask_by_id(self, mask_id):
+        masks = self.annot.get_mask(self.idx)
+        mask = masks[mask_id,:,:]
+        self.update_img_annot(mask[None,:,:])
+    
+    def show_mask_all(self):
+        masks = self.annot.get_mask(self.idx)
+        self.update_img_annot(masks)
 
     def add_points(self, pos, input_label):
         if self.current_points is None:
@@ -122,14 +140,14 @@ class ViewBox(pg.ViewBox):
         
         mask = mask[None,:,:]
         prev_masks = self.annot.get_mask(self.idx)
-        if prev_masks is not None:
+        if self.show_mask_mode=="all" and prev_masks is not None:
             mask = np.vstack((prev_masks, mask))
         self.update_img_annot(mask)
 
     def update_img_annot(self, mask):
         img = self.dset[self.idx]
-        img = draw_segmentation_masks(img, mask, self.alpha)
-        self.img_annot = img
+        if mask is not None:
+            img = draw_segmentation_masks(img, mask, self.alpha)
         self.clear_qt_objects()
         self.img = pg.ImageItem(img)
         self.addItem(self.img)
@@ -175,7 +193,7 @@ class ViewBox(pg.ViewBox):
         self.current_logits = None
         self.current_color = None
     
-    def update_annot_list(self):
+    def add_to_annot_list(self):
         masks = self.annot.get_mask(self.idx)
         mask_id = len(masks)
         self.parent.add_mask(mask_id)
@@ -185,9 +203,8 @@ class ViewBox(pg.ViewBox):
             self.annot.add_annotation(self.idx,
                                       self.current_masks,
                                       self.class_label)
-            self.annot.set_image(self.idx, self.img_annot)
             self.reset_current_annot()
-            self.update_annot_list()
+            self.add_to_annot_list()
         
         elif event.key() == Qt.Key_Escape:
             self.reset_current_annot()

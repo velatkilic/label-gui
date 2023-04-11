@@ -24,6 +24,20 @@ class Model:
         self.img_shape = None
         self.max_mask_region = None
     
+    def set_cached_img_embed(self, original_size=None, input_size=None, features=None):
+        self.predictor.reset_image()
+        self.predictor.original_size = original_size
+        self.predictor.input_size = input_size
+        self.predictor.features = features
+        self.predictor.is_image_set = True
+    
+    def get_img_embed(self):
+        img_embed = {}
+        img_embed["original_size"] = self.predictor.original_size
+        img_embed["input_size"] = self.predictor.input_size
+        img_embed["features"] = self.predictor.features
+        return img_embed
+
     def set_image(self, img):
         self.img_shape = img.shape
         self.predictor.set_image(img)
@@ -56,7 +70,7 @@ class Annotation:
     def __init__(self) -> None:
         self.masks = {}
         self.labels = {}
-        self.imgs = {}
+        self.img_embed = {}
     
     def add_annotation(self, frame_id, mask, label):
         if mask is None:
@@ -77,17 +91,11 @@ class Annotation:
         self.masks[frame_id] = masks
         self.labels[frame_id] = label
 
+    def add_img_embed(self, frame_id, img_embed):
+        self.img_embed[frame_id] = img_embed
+
     def get_mask(self, frame_id):
         if frame_id in self.masks:
             return np.array(self.masks[frame_id])
         else:
             return None
-
-    def get_image(self, frame_id):
-        if frame_id in self.imgs:
-            return self.imgs[frame_id]
-        else:
-            return None
-
-    def set_image(self, frame_id, img):
-        self.imgs[frame_id] = img

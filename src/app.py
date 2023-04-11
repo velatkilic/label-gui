@@ -39,6 +39,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.radio_annot_off.clicked.connect(self.label_mode_off)
         self.spinBox_mask_scale.valueChanged.connect(self.mask_scale)
         self.annot_list.currentItemChanged.connect(self.current_annot_changed)
+        self.radio_mask_all.clicked.connect(self.show_mask_all)
+        self.radio_mask_last.clicked.connect(self.show_mask_last)
 
         # view_box holds images
         self.view_box = ViewBox(self, lockAspect=True, invertY=True)
@@ -62,6 +64,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_next.clicked.connect(self.next)
 
         self.label_mode_off() # start with default off
+        self.show_mask_last() # default show the last mask
 
     def auto_detect(self):
         dialog = AutoDetectDialog()
@@ -98,6 +101,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fname = QFileDialog.getSaveFileName(self, "Save file", str(cwd), "JSON files (*.json)")
         fname =  Path(fname[0])
         # TODO
+
+    def show_mask_all(self):
+        self.view_box.set_show_mask_mode("all")
+
+    def show_mask_last(self):
+        self.view_box.set_show_mask_mode("last")
 
     def label_mode_on(self):
         self.spinBox_mask_scale.setEnabled(True)
@@ -148,7 +157,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_box.set_class_label(text)
 
     def current_annot_changed(self, item: QListWidgetItem):
-        print(item.text())
+        mask_text = item.text()
+        idx = int(mask_text.split()[-1]) - 1
+        self.view_box.show_mask_by_id(idx)
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())
