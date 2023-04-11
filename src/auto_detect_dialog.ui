@@ -314,6 +314,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spinBox_points_per_side</tabstop>
+  <tabstop>spinBox_quality_threshold</tabstop>
+  <tabstop>spinBox_stability_threshold</tabstop>
+  <tabstop>spinBox_nms_threshold</tabstop>
+  <tabstop>spinBox_crop_n_layers</tabstop>
+  <tabstop>spinBox_crop_nms_threshold</tabstop>
+  <tabstop>spinBox_crop_overlap_ratio</tabstop>
+  <tabstop>spinBox_max_mask_region</tabstop>
+  <tabstop>spinBox_min_mask_region</tabstop>
+  <tabstop>spinBox_points_per_batch</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -323,8 +335,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>228</x>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -339,11 +351,11 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>228</x>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
-     <x>286</x>
+     <x>239</x>
      <y>274</y>
     </hint>
    </hints>

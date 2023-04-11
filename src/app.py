@@ -35,9 +35,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_auto_detect.clicked.connect(self.auto_detect)
 
         # label mode
-        self.radio_mask_on.clicked.connect(self.label_mode_on)
-        self.radio_mask_off.clicked.connect(self.label_mode_off)
+        self.radio_annot_on.clicked.connect(self.label_mode_on)
+        self.radio_annot_off.clicked.connect(self.label_mode_off)
         self.spinBox_mask_scale.valueChanged.connect(self.mask_scale)
+        self.annot_list.currentItemChanged.connect(self.current_annot_changed)
 
         # view_box holds images
         self.view_box = ViewBox(self, lockAspect=True, invertY=True)
@@ -59,6 +60,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spinBox_frame_id.valueChanged.connect(self.navigate_to_idx)
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
+
+        self.label_mode_off() # start with default off
 
     def auto_detect(self):
         dialog = AutoDetectDialog()
@@ -98,7 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def label_mode_on(self):
         self.spinBox_mask_scale.setEnabled(True)
-        self.view_box.set_label_mode("mask_on")
+        self.view_box.set_label_mode("on")
 
     def label_mode_off(self):
         self.spinBox_mask_scale.setEnabled(False)
@@ -107,6 +110,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def navigate_to_idx(self, idx):
         self.view_box.navigate_to_idx(idx)
         self.update_hist()
+        self.annot_list.clear()
 
     def prev(self):
         idx = self.view_box.prev()
@@ -128,6 +132,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def mask_scale(self, mask_scale):
         self.view_box.mask_scale = mask_scale
 
+    def add_mask(self, id):
+        text = "Mask " + str(id)
+        item = QListWidgetItem(text)
+        self.annot_list.addItem(item)
+
     def add_class(self) -> None:
         text = self.class_label.text()
         item = QListWidgetItem(text)
@@ -137,6 +146,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_list.addItem(item)
 
         self.view_box.set_class_label(text)
+
+    def current_annot_changed(self, item: QListWidgetItem):
+        print(item.text())
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())

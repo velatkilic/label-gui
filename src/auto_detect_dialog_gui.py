@@ -143,6 +143,15 @@ class Ui_Dialog(object):
         self.buttonBox.accepted.connect(Dialog.accept) # type: ignore
         self.buttonBox.rejected.connect(Dialog.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.spinBox_points_per_side, self.spinBox_quality_threshold)
+        Dialog.setTabOrder(self.spinBox_quality_threshold, self.spinBox_stability_threshold)
+        Dialog.setTabOrder(self.spinBox_stability_threshold, self.spinBox_nms_threshold)
+        Dialog.setTabOrder(self.spinBox_nms_threshold, self.spinBox_crop_n_layers)
+        Dialog.setTabOrder(self.spinBox_crop_n_layers, self.spinBox_crop_nms_threshold)
+        Dialog.setTabOrder(self.spinBox_crop_nms_threshold, self.spinBox_crop_overlap_ratio)
+        Dialog.setTabOrder(self.spinBox_crop_overlap_ratio, self.spinBox_max_mask_region)
+        Dialog.setTabOrder(self.spinBox_max_mask_region, self.spinBox_min_mask_region)
+        Dialog.setTabOrder(self.spinBox_min_mask_region, self.spinBox_points_per_batch)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate

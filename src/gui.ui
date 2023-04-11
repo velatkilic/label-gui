@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>796</width>
-    <height>591</height>
+    <width>893</width>
+    <height>668</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,32 +83,44 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QRadioButton" name="radio_mask_on">
+           <widget class="QLabel" name="label">
             <property name="font">
              <font>
               <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Annotation On</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Annotate</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radio_mask_off">
+           <widget class="QRadioButton" name="radio_annot_on">
             <property name="font">
              <font>
               <pointsize>9</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Annotation Off</string>
+             <string>On</string>
             </property>
             <property name="checked">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radio_annot_off">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Off</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -130,6 +142,9 @@
           </item>
           <item>
            <widget class="QSpinBox" name="spinBox_mask_scale">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="font">
              <font>
               <pointsize>9</pointsize>
@@ -149,6 +164,16 @@
          </layout>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QListWidget" name="annot_list">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
@@ -292,7 +317,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>796</width>
+     <width>893</width>
      <height>26</height>
     </rect>
    </property>
@@ -376,6 +401,20 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>button_process_video</tabstop>
+  <tabstop>button_cluster</tabstop>
+  <tabstop>radio_annot_on</tabstop>
+  <tabstop>radio_annot_off</tabstop>
+  <tabstop>spinBox_mask_scale</tabstop>
+  <tabstop>class_label</tabstop>
+  <tabstop>button_add_class_label</tabstop>
+  <tabstop>label_list</tabstop>
+  <tabstop>spinBox_frame_id</tabstop>
+  <tabstop>button_prev</tabstop>
+  <tabstop>button_auto_detect</tabstop>
+  <tabstop>button_next</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

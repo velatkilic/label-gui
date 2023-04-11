@@ -16,12 +16,11 @@ class ViewBox(pg.ViewBox):
         self.parent = parent
         self.idx = 0
         self.img = None
-        self.label_mode = "mask_on"
+        self.label_mode = "off"
         self.class_label = "unspecified"
         self.circle = None
         self.alpha = 0.5
         self.mask_scale = 1
-        self.image_annot = None
         
         # model inputs and outputs
         self.current_points = None
@@ -43,6 +42,7 @@ class ViewBox(pg.ViewBox):
         self.annot.add_auto_detect_annot(self.idx, annots)
         masks = self.annot.get_mask(self.idx)
         self.update_img_annot(masks)
+        self.update_annot_list()
 
     def load_images(self, fname):
         if len(fname):
@@ -77,11 +77,11 @@ class ViewBox(pg.ViewBox):
     def set_image(self) -> None:
         self.clear_qt_objects() # clear current contents
         img = self.dset[self.idx]
-        if self.label_mode == "mask_on":
+        if self.label_mode == "on":
             self.model.set_image(img)
         
         img_annot = self.annot.get_image(self.idx)
-        if self.label_mode == "mask_on" and img_annot is not None:
+        if self.label_mode == "on" and img_annot is not None:
             self.img = pg.ImageItem(img_annot)
         else:
             self.img = pg.ImageItem(img)
@@ -90,7 +90,7 @@ class ViewBox(pg.ViewBox):
     
     def set_label_mode(self, label_mode):
         self.label_mode = label_mode
-        if label_mode == "mask_on":
+        if label_mode == "on":
             self.set_image()
 
     def set_class_label(self, class_label):
@@ -141,14 +141,14 @@ class ViewBox(pg.ViewBox):
         except:
             pos = QPoint(0,0)
 
-        if self.label_mode == "mask_on":
+        if self.label_mode == "on":
             if event.button() == Qt.LeftButton:
                 self.add_points(pos, input_label=1) # 1 = foreground
             elif event.button() == Qt.RightButton:
                 self.add_points(pos, input_label=0) # 0 = background
     
     def hoverEvent(self, event: QMouseEvent):
-        if self.img is not None and self.label_mode == "mask_on":
+        if self.img is not None and self.label_mode == "on":
             try:
                 pos = self.calc_pos(event.pos())
             except:
@@ -174,6 +174,11 @@ class ViewBox(pg.ViewBox):
         self.current_scores = None
         self.current_logits = None
         self.current_color = None
+    
+    def update_annot_list(self):
+        masks = self.annot.get_mask(self.idx)
+        mask_id = len(masks)
+        self.parent.add_mask(mask_id)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
@@ -182,6 +187,7 @@ class ViewBox(pg.ViewBox):
                                       self.class_label)
             self.annot.set_image(self.idx, self.img_annot)
             self.reset_current_annot()
+            self.update_annot_list()
         
         elif event.key() == Qt.Key_Escape:
             self.reset_current_annot()
