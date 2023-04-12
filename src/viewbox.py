@@ -1,13 +1,15 @@
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QProgressDialog
 
 import numpy as np
 import os
 from pathlib import Path
 
 from dataset import Dataset
-from model import Model, Annotation
+from model import Model
+from annotation import Annotation
 from utils import draw_segmentation_masks
 
 class ViewBox(pg.ViewBox):
@@ -39,11 +41,31 @@ class ViewBox(pg.ViewBox):
         self.circle = None
         self.img = None
 
-    def auto_detect(self):
-        img = self.get_img()
-        annots = self.model.generate(img)
-        self.annot.add_auto_detect_annot(self.idx, annots)
-        masks = self.annot.get_mask(self.idx)
+    def auto_detect(self, bboxes=None, predict_mode=None):
+        self.parent.label_mode_on()
+        if predict_mode == "current":
+            bboxes = bboxes[self.idx]
+            self.auto_detect_single(bboxes)
+        else:
+            pb = QProgressDialog("Calculating masks", "Cancel", 0, len(self.dset))
+            pb.setWindowModality(Qt.WindowModal)
+            for i in range(len(self.dset)):
+                self.navigate_to_idx(i)
+                bboxes_current = bboxes[i]
+                self.auto_detect_single(bboxes_current)
+                # update progress bar
+                if pb.wasCanceled():
+                    break
+                pb.setValue(i)
+
+    def auto_detect_single(self, bboxes):
+        self.set_image()
+        masks = []
+        for bbox in bboxes:
+            mask, _, _ = self.model.predict(input_box=bbox[None, :], multimask_output=False)
+            masks.append(mask[0,:,:])
+        masks = np.array(masks)
+        self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
         for i in range(len(masks)): self.parent.add_mask(i)
 
@@ -85,7 +107,7 @@ class ViewBox(pg.ViewBox):
             # if embedding cached use that instead,
             # else, compute and cache embedding
             if self.idx in self.annot.img_embed:
-                self.model.set_cached_img_embed(self.annot.img_embed[self.idx])
+                self.model.set_cached_img_embed(**self.annot.img_embed[self.idx])
             else:
                 self.model.set_image(img)
                 img_embed = self.model.get_img_embed()
@@ -97,10 +119,7 @@ class ViewBox(pg.ViewBox):
     
     def set_show_mask_mode(self, show_mode):
         self.show_mask_mode = show_mode
-        if show_mode == "all":
-            self.show_mask_all()
-        elif self.last_selected_id is not None:
-                self.show_mask_by_id(self.last_selected_id)
+        self.show_mask()
 
     def set_label_mode(self, label_mode):
         self.label_mode = label_mode
@@ -111,6 +130,12 @@ class ViewBox(pg.ViewBox):
     
     def current_label_changed(self, class_label):
         self.class_label = class_label
+
+    def show_mask(self):
+        if self.show_mask_mode == "all":
+            self.show_mask_all()
+        elif self.last_selected_id is not None:
+                self.show_mask_by_id(self.last_selected_id)
 
     def show_mask_by_id(self, mask_id):
         masks = self.annot.get_mask(self.idx)
