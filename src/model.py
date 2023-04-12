@@ -3,7 +3,9 @@ import torch
 import cv2 as cv
 import os
 from pathlib import Path
-from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskGenerator
+
+from segment_anything import sam_model_registry, SamPredictor
+from utils import normalize
 
 class Model:
     def __init__(self, sam_checkpoint = None, model_type=None, device=None):
@@ -123,3 +125,55 @@ class MOG2:
             if img is None: break
             gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             self.mog2.apply(gray)
+
+class Farneback:
+    def __init__(self, dataset, pyr_scale=0.5, levels=5, winsize=15, 
+                 iterations=3, poly_n=5, poly_sigma=1.2, it_closing=1,
+                 min_area=20, flags=0):
+        self.dset = dataset
+        self.params = {
+            "pyr_scale" : pyr_scale,
+            "levels"    : levels,
+            "winsize"   : winsize,
+            "iterations": iterations,
+            "poly_n"    : poly_n,
+            "poly_sigma": poly_sigma,
+            "flags"     : flags
+        }
+        self.it_closing = it_closing
+        self.min_area = min_area
+    
+    def predict(self, idx):
+        if idx==0:
+            prev_img = self.dset[idx]
+            next_img = self.dset[idx+1]
+        else:
+            prev_img = self.dset[idx-1]
+            next_img = self.dset[idx]
+        
+        prev_img = cv.cvtColor(prev_img, cv.COLOR_BGR2GRAY)
+        next_img = cv.cvtColor(next_img, cv.COLOR_BGR2GRAY)
+
+        flow = cv.calcOpticalFlowFarneback(prev_img, next_img, None, **self.params)
+        mag, ang = cv.cartToPolar(flow[...,0], flow[...,1])
+
+        mag = 255.*normalize(mag)
+        mag = mag.astype(np.uint8)
+
+        # Morphological transformation: closing
+        kernel = np.ones((8, 8), dtype=np.uint8)
+        closing = cv.morphologyEx(mag, cv.MORPH_CLOSE, kernel, iterations=self.it_closing)
+        closing = cv.adaptiveThreshold(closing, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
+
+        # Contours
+        contours, hierarchy = cv.findContours(closing, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+
+        # Bounding rectangle
+        bbox = []
+        for temp in contours:
+            area = cv.contourArea(temp)
+            if area > self.min_area:
+                x, y, w, h = cv.boundingRect(temp)
+                bbox.append(np.array([x, y, x + w, y + h]))
+
+        return bbox

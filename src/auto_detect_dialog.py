@@ -1,7 +1,7 @@
 from auto_detect_dialog_gui import Ui_Dialog
 from PyQt5.QtWidgets import QDialog, QErrorMessage
 
-from model import MOG2, Canny
+from model import MOG2, Canny, Farneback
 
 class AutoDetectDialog(QDialog, Ui_Dialog):
     def __init__(self, dataset, frame_idx, *args, **kwargs):
@@ -12,7 +12,7 @@ class AutoDetectDialog(QDialog, Ui_Dialog):
         
         self.dset = dataset
         self.model = None
-        self.model_type = ""
+        self.model_type = "farneback"
         self.frame_idx = frame_idx
         self.predict_mode = "current"
         self.params = {}
@@ -51,7 +51,7 @@ class AutoDetectDialog(QDialog, Ui_Dialog):
             self.model = MOG2(self.dset, **self.params)
         
         elif self.model_type == "farneback":
-            raise NotImplementedError
+            self.model = Farneback(self.dset, **self.params)
         
         elif self.model_type == "rcnn":
             raise NotImplementedError
@@ -90,7 +90,8 @@ class AutoDetectDialog(QDialog, Ui_Dialog):
             "levels": self.spinBox_farneback_levels.value(),
             "winsize": self.spinBox_farneback_win_size.value(),
             "iterations": self.spinBox_farneback_it.value(),
-            "poly_n": self.spinBox_farneback_poly_n.value()
+            "poly_n": self.spinBox_farneback_poly_n.value(),
+            "poly_sigma": self.spinBox_farneback_poly_sigma.value()
         }
 
     def get_params_rcnn(self):
