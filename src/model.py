@@ -4,7 +4,7 @@ import cv2 as cv
 import os
 from pathlib import Path
 
-from segment_anything import sam_model_registry, SamPredictor
+from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskGenerator
 from utils import normalize
 
 class Model:
@@ -49,6 +49,23 @@ class Model:
             multimask_output=multimask_output
         )
         return masks, scores, logits
+
+class SAMAuto:
+    def __init__(self, dataset, sam, max_mask_region=None, **kwargs):
+        self.dset = dataset
+        self.max_mask_region = max_mask_region
+        self.auto_mask_generator = SamAutomaticMaskGenerator(model=sam,**kwargs)
+    
+    def predict(self, idx):
+        img = self.dset[idx]
+        annots = self.auto_mask_generator.generate(img)
+        masks = []
+        for annot in annots:
+            if self.max_mask_region is None or annot["area"] < self.max_mask_region:
+                masks.append(annot["segmentation"])
+        
+        return masks
+
 
 class Canny:
     def __init__(self, dataset, th1=50, th2=100, min_area=20, it_closing=1):

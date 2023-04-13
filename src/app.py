@@ -67,9 +67,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show_mask_last() # default show the last mask
 
     def auto_detect(self):
-        dialog = AutoDetectDialog(self.view_box.dset, self.view_box.idx)
+        dialog = AutoDetectDialog(self.view_box.dset, self.view_box.idx, self.view_box.model.sam)
         dialog.exec()
-        self.view_box.auto_detect(bboxes=dialog.output, predict_mode=dialog.predict_mode)
+        self.view_box.auto_detect(dialog.output, dialog.predict_mode, dialog.model_type)
     
     def update_frame_id(self):
         frame_count = len(self.view_box.dset)

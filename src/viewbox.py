@@ -41,30 +41,33 @@ class ViewBox(pg.ViewBox):
         self.circle = None
         self.img = None
 
-    def auto_detect(self, bboxes=None, predict_mode=None):
+    def auto_detect(self, annot_dict, predict_mode, model_type):
         self.parent.label_mode_on()
         if predict_mode == "current":
-            bboxes = bboxes[self.idx]
-            self.auto_detect_single(bboxes)
+            annot = annot_dict[self.idx]
+            self.auto_detect_single(annot,model_type)
         else:
             pb = QProgressDialog("Calculating masks", "Cancel", 0, len(self.dset))
             pb.setWindowModality(Qt.WindowModal)
             for i in range(len(self.dset)):
                 self.navigate_to_idx(i)
-                bboxes_current = bboxes[i]
-                self.auto_detect_single(bboxes_current)
+                annot = annot_dict[i]
+                self.auto_detect_single(annot, model_type)
                 # update progress bar
                 if pb.wasCanceled():
                     break
                 pb.setValue(i)
 
-    def auto_detect_single(self, bboxes):
-        self.set_image()
-        masks = []
-        for bbox in bboxes:
-            mask, _, _ = self.model.predict(input_box=bbox[None, :], multimask_output=False)
-            masks.append(mask[0,:,:])
-        masks = np.array(masks)
+    def auto_detect_single(self, annot, model_type):
+        if model_type == "sam":
+            masks = annot
+        else:
+            self.set_image()
+            masks = []
+            for bbox in annot:
+                mask, _, _ = self.model.predict(input_box=bbox[None, :], multimask_output=False)
+                masks.append(mask[0,:,:])
+            masks = np.array(masks)
         self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
         for i in range(len(masks)): self.parent.add_mask(i)
