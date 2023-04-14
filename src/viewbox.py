@@ -81,7 +81,7 @@ class ViewBox(pg.ViewBox):
         for i in range(len(masks)): self.parent.add_mask(i+1, self.class_label)
 
     def load_images(self, fname):
-        if len(fname):
+        if len(fname) > 0:
             fname = Path(fname)
             self.dset.set_image_folder(fname)
             self.last_dir = os.path.dirname(fname)
@@ -103,7 +103,7 @@ class ViewBox(pg.ViewBox):
             if labels is not None:
                 for i, label in enumerate(labels):
                     self.parent.add_mask(i+1, label)
-            
+            self.set_image()
             self.show_mask()
 
     def prev(self):
