@@ -120,6 +120,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.annot_list.sizePolicy().hasHeightForWidth())
         self.annot_list.setSizePolicy(sizePolicy)
+        self.annot_list.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
         self.annot_list.setObjectName("annot_list")
         self.verticalLayout.addWidget(self.annot_list)
         self.horizontalLayout = QtWidgets.QHBoxLayout()

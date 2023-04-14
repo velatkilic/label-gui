@@ -34,6 +34,16 @@ class Annotation:
         else:
             return None
     
+    def get_labels(self, frame_id):
+        if frame_id in self.labels:
+            return self.labels[frame_id]
+        else:
+            return None
+    
+    def set_label(self, frame_id, label_id, label):
+        if self.labels[frame_id] is not None:
+            self.labels[frame_id][label_id] = label
+
     def delete_mask(self, frame_idx, annot_idx):
         del self.masks[frame_idx][annot_idx]
         del self.labels[frame_idx][annot_idx]

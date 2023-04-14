@@ -204,6 +204,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+        </property>
        </widget>
       </item>
       <item>

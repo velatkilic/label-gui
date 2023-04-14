@@ -142,8 +142,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def mask_scale(self, mask_scale):
         self.view_box.mask_scale = mask_scale
 
-    def add_mask(self, idx):
-        text = "Mask " + str(idx)
+    def add_mask(self, idx, class_label):
+        text = str(idx) + " - " + class_label
         item = QListWidgetItem(text)
         self.annot_list.addItem(item)
         self.view_box.last_selected_id = idx - 1
@@ -164,6 +164,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def add_class(self) -> None:
         text = self.class_label.text()
+        text = "_".join(text.split()) # remove spaces
         item = QListWidgetItem(text)
         item.setFlags(item.flags() | Qt.ItemIsEditable)
 
@@ -176,11 +177,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if item is None: return
 
         mask_text = item.text()
-        idx = int(mask_text.split()[-1]) - 1
+        idx = int(mask_text.split()[0]) - 1
         self.current_annot_idx = idx
 
         if self.view_box.show_mask_mode == "last":
             self.view_box.show_mask_by_id(idx)
+
+    def change_annot_class_label(self):
+        # update listview
+        annot_item = self.annot_list.currentItem()
+        text = annot_item.text().split()
+        label_id = int(text[0]) - 1
+        text[-1] = self.view_box.class_label
+        text = " ".join(text)
+        annot_item.setText(text)
+
+        # update annotation
+        self.view_box.annot.set_label(self.view_box.idx, label_id, self.view_box.class_label)
+
 
     def current_label_changed(self, item: QListWidgetItem) -> None:
         self.view_box.current_label_changed(item.text())
@@ -192,6 +206,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.next()
         elif event.key() == Qt.Key_Delete:
             self.delete_mask()
+        elif event.key() == Qt.Key_Shift:
+            self.change_annot_class_label()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

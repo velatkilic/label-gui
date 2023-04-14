@@ -70,7 +70,7 @@ class ViewBox(pg.ViewBox):
             masks = np.array(masks)
         self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
-        for i in range(len(masks)): self.parent.add_mask(i+1)
+        for i in range(len(masks)): self.parent.add_mask(i+1, self.class_label)
 
     def load_images(self, fname):
         if len(fname):
@@ -91,9 +91,10 @@ class ViewBox(pg.ViewBox):
     def navigate_to_idx(self, idx):
         if len(self.dset) > 0:
             self.idx = idx
-            masks = self.annot.get_mask(self.idx)
-            if masks is not None:
-                for i in range(len(masks)): self.parent.add_mask(i+1)
+            labels = self.annot.get_labels(self.idx)
+            if labels is not None:
+                for i, label in enumerate(labels):
+                    self.parent.add_mask(i+1, label)
             
             self.show_mask()
 
@@ -232,7 +233,7 @@ class ViewBox(pg.ViewBox):
     def add_to_annot_list(self):
         masks = self.annot.get_mask(self.idx)
         mask_id = len(masks)
-        self.parent.add_mask(mask_id)
+        self.parent.add_mask(mask_id, self.class_label)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
