@@ -41,6 +41,14 @@ class ViewBox(pg.ViewBox):
         self.circle = None
         self.img = None
 
+    def clear_data(self):
+        self.clear_qt_objects()
+        self.reset_current_annot()
+        self.last_selected_id = None
+        self.dset = Dataset()
+        self.annot = Annotation()
+
+
     def auto_detect(self, annot_dict, predict_mode, model_type):
         self.parent.label_mode_on()
         if predict_mode == "current":
@@ -143,7 +151,9 @@ class ViewBox(pg.ViewBox):
         if self.show_mask_mode == "all":
             self.show_mask_all()
         elif self.last_selected_id is not None:
-                self.show_mask_by_id(self.last_selected_id)
+            self.show_mask_by_id(self.last_selected_id)
+        else:
+            self.set_image()
 
     def show_mask_by_id(self, mask_id):
         masks = self.annot.get_mask(self.idx)
