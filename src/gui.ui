@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>893</width>
-    <height>688</height>
+    <width>889</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,30 +48,6 @@
         </property>
         <property name="text">
          <string>Auto-Detect</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_process_video">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Process Video</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_cluster">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Cluster Detections</string>
         </property>
        </widget>
       </item>
@@ -223,7 +199,7 @@
       <item>
        <widget class="QListWidget" name="annot_list">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -372,7 +348,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>893</width>
+     <width>889</width>
      <height>26</height>
     </rect>
    </property>
@@ -457,8 +433,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>button_process_video</tabstop>
-  <tabstop>button_cluster</tabstop>
   <tabstop>radio_annot_on</tabstop>
   <tabstop>radio_annot_off</tabstop>
   <tabstop>spinBox_mask_scale</tabstop>
@@ -473,7 +447,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

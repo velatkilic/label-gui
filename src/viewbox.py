@@ -142,8 +142,11 @@ class ViewBox(pg.ViewBox):
 
     def show_mask_by_id(self, mask_id):
         masks = self.annot.get_mask(self.idx)
-        mask = masks[mask_id,:,:]
-        self.update_img_annot(mask[None,:,:])
+        if masks is not None and len(masks) > 0:
+            mask = masks[mask_id,:,:]
+            self.update_img_annot(mask[None,:,:])
+        else:
+            self.update_img_annot(None)
     
     def show_mask_all(self):
         masks = self.annot.get_mask(self.idx)

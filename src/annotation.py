@@ -33,3 +33,7 @@ class Annotation:
             return np.array(self.masks[frame_id])
         else:
             return None
+    
+    def delete_mask(self, frame_idx, annot_idx):
+        del self.masks[frame_idx][annot_idx]
+        del self.labels[frame_idx][annot_idx]

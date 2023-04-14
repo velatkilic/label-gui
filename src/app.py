@@ -66,6 +66,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_mode_off() # start with default off
         self.show_mask_last() # default show the last mask
 
+        self.current_annot_idx = 0
+
     def auto_detect(self):
         dialog = AutoDetectDialog(self.view_box.dset, self.view_box.idx, self.view_box.model.sam)
         dialog.exec()
@@ -145,6 +147,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         item = QListWidgetItem(text)
         self.annot_list.addItem(item)
         self.view_box.last_selected_id = idx - 1
+    
+    def delete_mask(self):
+        self.view_box.annot.delete_mask(self.view_box.idx, self.current_annot_idx)
+        if self.current_annot_idx == 0:
+            new_id = 0
+        else:
+            new_id = self.current_annot_idx - 1
+        self.view_box.last_selected_id = new_id
+        if self.view_box.show_mask_mode == "last":
+            self.view_box.show_mask_by_id(new_id)
+        else:
+            self.view_box.show_mask_all()
+        
+        self.annot_list.takeItem(self.annot_list.count()-1)
 
     def add_class(self) -> None:
         text = self.class_label.text()
@@ -156,9 +172,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_box.set_class_label(text)
 
-    def current_annot_changed(self, item: QListWidgetItem):
+    def current_annot_changed(self, item):
+        if item is None: return
+
         mask_text = item.text()
         idx = int(mask_text.split()[-1]) - 1
+        self.current_annot_idx = idx
+
         if self.view_box.show_mask_mode == "last":
             self.view_box.show_mask_by_id(idx)
 
@@ -170,6 +190,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.prev()
         elif event.key() == Qt.Key_Right:
             self.next()
+        elif event.key() == Qt.Key_Delete:
+            self.delete_mask()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
