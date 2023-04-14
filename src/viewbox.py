@@ -70,7 +70,7 @@ class ViewBox(pg.ViewBox):
             masks = np.array(masks)
         self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
-        for i in range(len(masks)): self.parent.add_mask(i)
+        for i in range(len(masks)): self.parent.add_mask(i+1)
 
     def load_images(self, fname):
         if len(fname):
@@ -91,7 +91,11 @@ class ViewBox(pg.ViewBox):
     def navigate_to_idx(self, idx):
         if len(self.dset) > 0:
             self.idx = idx
-            self.set_image()
+            masks = self.annot.get_mask(self.idx)
+            if masks is not None:
+                for i in range(len(masks)): self.parent.add_mask(i+1)
+            
+            self.show_mask()
 
     def prev(self):
         return (self.idx - 1) % len(self.dset)

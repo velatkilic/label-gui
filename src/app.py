@@ -117,9 +117,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_box.set_label_mode("off")
 
     def navigate_to_idx(self, idx):
+        self.annot_list.clear()
         self.view_box.navigate_to_idx(idx)
         self.update_hist()
-        self.annot_list.clear()
         self.view_box.show_mask()
 
     def prev(self):

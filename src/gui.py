@@ -115,7 +115,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.addWidget(self.radio_mask_last)
         self.verticalLayout.addLayout(self.horizontalLayout_10)
         self.annot_list = QtWidgets.QListWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.annot_list.sizePolicy().hasHeightForWidth())
