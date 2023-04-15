@@ -81,6 +81,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def load_images(self) -> None:
         fname = QFileDialog.getExistingDirectory(self, 'Select Folder', str(self.last_dir))
         if fname is not None and len(fname) > 0:
+            self.annot_list.clear()
             self.view_box.clear_data()
             self.last_dir = os.path.dirname(fname)
             self.view_box.load_images(fname)
@@ -90,6 +91,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def load_video(self):
         fname = QFileDialog.getOpenFileName(self, "Select Video File", str(self.last_dir), "Video Files (*.mp4; *.avi)")[0]
         if fname is not None and len(fname) > 0:
+            self.annot_list.clear()
             self.view_box.clear_data()
             self.last_dir = os.path.dirname(fname)
             self.view_box.load_video(fname)
