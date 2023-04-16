@@ -11,7 +11,7 @@ class Model:
     def __init__(self, sam_checkpoint = None, model_type=None, device=None):
 
         if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         if sam_checkpoint is None:
             sam_checkpoint = os.path.join(os.getcwd(), "models" ,"sam_vit_h_4b8939.pth")
@@ -20,21 +20,21 @@ class Model:
             model_type = "vit_h"
         
         self.sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-        self.sam.to(device=device)
+        self.sam.to(device=self.device)
         self.predictor = SamPredictor(self.sam)
     
     def set_cached_img_embed(self, original_size=None, input_size=None, features=None):
         self.predictor.reset_image()
         self.predictor.original_size = original_size
         self.predictor.input_size = input_size
-        self.predictor.features = features
+        self.predictor.features = features.to(self.device) 
         self.predictor.is_image_set = True
     
     def get_img_embed(self):
         img_embed = {}
         img_embed["original_size"] = self.predictor.original_size
         img_embed["input_size"] = self.predictor.input_size
-        img_embed["features"] = self.predictor.features
+        img_embed["features"] = self.predictor.features.to("cpu") # copy to host (cpu) otherwise device (gpu) could run out of memory
         return img_embed
 
     def set_image(self, img):

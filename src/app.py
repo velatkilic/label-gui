@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (QApplication,
                             QMainWindow,
                             QFileDialog,
                             QListWidgetItem,
+                            QProgressDialog
                             )
 import pyqtgraph as pg
 
@@ -62,6 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spinBox_frame_id.valueChanged.connect(self.navigate_to_idx)
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
+        self.button_embedding.clicked.connect(self.compute_embeddings)
 
         self.label_mode_off() # start with default off
         self.show_mask_last() # default show the last mask
@@ -127,6 +129,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_box.navigate_to_idx(idx)
         self.update_hist()
         self.view_box.show_mask()
+    
+    def compute_embeddings(self):
+        self.label_mode_on()
+        nframes = len(self.view_box.dset)
+        if nframes > 0:
+            pb = QProgressDialog("Pre-computing image embeddings ...", "Cancel", 0, nframes)
+            pb.setWindowModality(Qt.WindowModal)
+            for i in range(nframes):
+                self.next()
+
+                if pb.wasCanceled():
+                    break
+                pb.setValue(i)
 
     def prev(self):
         idx = self.view_box.prev()

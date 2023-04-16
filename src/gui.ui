@@ -340,6 +340,18 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="button_embedding">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Pre-Compute Embeddings</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
