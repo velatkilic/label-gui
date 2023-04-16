@@ -2,7 +2,6 @@ import numpy as np
 import sys
 import os
 from pathlib import Path
-import json
 
 from gui import Ui_MainWindow
 from auto_detect_dialog import AutoDetectDialog
@@ -57,7 +56,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_load_video.triggered.connect(self.load_video)
         self.action_load_images.triggered.connect(self.load_images)
         self.action_load_annot.triggered.connect(self.load_annot)
-        self.action_save.triggered.connect(self.save_annot)
+        self.action_load_embeddings.triggered.connect(self.load_embeddings)
+        self.action_save_annot.triggered.connect(self.save_annot)
+        self.action_save_embeddings.triggered.connect(self.save_embeddings)
 
         # prev/next
         self.spinBox_frame_id.valueChanged.connect(self.navigate_to_idx)
@@ -102,13 +103,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def load_annot(self):
         fname = QFileDialog.getOpenFileName(self, "Select Annotation File", str(self.last_dir), "JSON Files (*.json)")[0]
-        # TODO
+        if fname is not None and len(fname) > 0:
+            self.view_box.annot.load_annot_from_file(Path(fname))
+            self.navigate_to_idx(self.view_box.idx)
+
+            unique_labels = set()
+            for frame_id, labels in self.view_box.annot.labels.items():
+                for label in labels:
+                    if not(label in unique_labels):
+                        self.class_label.setText(label)
+                        self.add_class()
+                        unique_labels.add(label)
+    
+    def load_embeddings(self):
+        fname = QFileDialog.getOpenFileName(self, "Select Embedding File", str(self.last_dir), "Pytorch Files (*.pth; *.pt)")[0]
+        if fname is not None and len(fname) > 0:
+            self.view_box.annot.load_embed_from_torch(Path(fname))
+            self.radio_annot_on.click()
 
     def save_annot(self) -> Path:
-        cwd = os.getcwd()
-        fname = QFileDialog.getSaveFileName(self, "Save file", str(cwd), "JSON files (*.json)")
-        fname =  Path(fname[0])
-        # TODO
+        fname = QFileDialog.getSaveFileName(self, "Save file", str(self.last_dir), "JSON Files (*.json)")[0]
+        if fname is not None and len(fname) > 0:
+            self.view_box.annot.save_annotations(Path(fname))
+    
+    def save_embeddings(self):
+        fname = QFileDialog.getSaveFileName(self, "Save file", str(self.last_dir), "Pytorch Files (*.pth; *.pt)")[0]
+        if fname is not None and len(fname) > 0:
+            self.view_box.annot.save_embed(Path(fname))
 
     def show_mask_all(self):
         self.view_box.set_show_mask_mode("all")
@@ -131,7 +152,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_box.show_mask()
     
     def compute_embeddings(self):
-        self.label_mode_on()
         nframes = len(self.view_box.dset)
         if nframes > 0:
             pb = QProgressDialog("Pre-computing image embeddings ...", "Cancel", 0, nframes)
@@ -142,6 +162,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if pb.wasCanceled():
                     break
                 pb.setValue(i)
+            self.radio_annot_on.click()
 
     def prev(self):
         idx = self.view_box.prev()

@@ -1,5 +1,7 @@
 import numpy as np
-
+import torch
+import json
+from utils import rle_encode, rle_decode
 class Annotation:
     def __init__(self) -> None:
         self.masks = {}
@@ -47,3 +49,37 @@ class Annotation:
     def delete_mask(self, frame_idx, annot_idx):
         del self.masks[frame_idx][annot_idx]
         del self.labels[frame_idx][annot_idx]
+
+    def load_annot_from_file(self, fname):
+        with open(fname, "r") as file:
+            annots = json.load(file)
+
+        for annot in annots:
+            frame_id = annot["image_id"]
+            masks = rle_decode(annot["masks"])
+            self.masks[frame_id] = masks
+            self.labels[frame_id] = annot["labels"]
+
+    def save_annotations(self, fname):
+        annot = []
+        for frame_id, mask in self.masks.items():
+            masks = rle_encode(mask)
+            frame_annot = {"image_id":frame_id,
+                           "masks": masks,
+                           "labels": self.labels[frame_id]}
+            annot.append(frame_annot)
+
+        # save data dict as json
+        with open(fname, "w") as file:
+            json.dump(annot, file)
+
+    def load_embed_from_torch(self, fname):
+        img_embed = torch.load(fname)
+        for i, embed in enumerate(img_embed):
+            self.img_embed[i] = embed
+    
+    def save_embed(self, fname):
+        img_embed = []
+        for frame_id in self.img_embed:
+            img_embed.append(self.img_embed[frame_id])
+        torch.save(img_embed, fname)

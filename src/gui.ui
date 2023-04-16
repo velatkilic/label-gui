@@ -374,8 +374,10 @@
     <addaction name="action_load_video"/>
     <addaction name="action_load_images"/>
     <addaction name="action_load_annot"/>
+    <addaction name="action_load_embeddings"/>
     <addaction name="separator"/>
-    <addaction name="action_save"/>
+    <addaction name="action_save_annot"/>
+    <addaction name="action_save_embeddings"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -404,9 +406,9 @@
     <string>Load segmentation masks</string>
    </property>
   </action>
-  <action name="action_save">
+  <action name="action_save_annot">
    <property name="text">
-    <string>Save</string>
+    <string>Save Annotations</string>
    </property>
    <property name="statusTip">
     <string>Save annotations</string>
@@ -436,6 +438,16 @@
   <action name="action_load_video">
    <property name="text">
     <string>Load Video File</string>
+   </property>
+  </action>
+  <action name="action_load_embeddings">
+   <property name="text">
+    <string>Load Embeddings</string>
+   </property>
+  </action>
+  <action name="action_save_embeddings">
+   <property name="text">
+    <string>Save Embeddings</string>
    </property>
   </action>
  </widget>

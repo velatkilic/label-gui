@@ -1,5 +1,6 @@
 import numpy as np
 import colorsys
+from pycocotools import mask as coco_mask
 
 def normalize(x):
     x = x.astype(np.float32)
@@ -47,3 +48,20 @@ def make_new_color(seed_color, a=20, b=5):
     h = np.clip(h, 0, 259)
     
     return np.array((h,s,v))
+
+def rle_encode(mask_list):
+    mask = np.asfortranarray(np.stack(mask_list, axis=2))
+    masks_rle = coco_mask.encode(mask)
+    masks_str = []
+    for masks in masks_rle:
+        masks_str.append({"size":masks["size"], "counts":masks["counts"].decode("ascii")})
+    return masks_str
+
+def rle_decode(rle_dict):
+    masks = []
+    for i in range(len(rle_dict)):
+        rle = rle_dict[i]
+        rle["counts"] = rle["counts"].encode("ascii")
+        mask = coco_mask.decode(rle)
+        masks.append(mask.astype(np.bool_))
+    return masks
