@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import (QApplication,
                             QMainWindow,
                             QFileDialog,
                             QListWidgetItem,
-                            QProgressDialog
+                            QProgressDialog,
+                            QMessageBox
                             )
 import pyqtgraph as pg
 
@@ -101,7 +102,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update_frame_id()
             self.set_hist()
     
+    def err_msg_load_dset_first(self):
+        err_dlg = QMessageBox(self)
+        err_dlg.setWindowTitle("Error")
+        err_dlg.setText("Load an image folder or a video file first!")
+        err_dlg.exec()
+
     def load_annot(self):
+        if len(self.view_box.dset) == 0:
+            self.err_msg_load_dset_first()
+            return
         fname = QFileDialog.getOpenFileName(self, "Select Annotation File", str(self.last_dir), "JSON Files (*.json)")[0]
         if fname is not None and len(fname) > 0:
             self.view_box.annot.load_annot_from_file(Path(fname))
@@ -116,17 +126,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         unique_labels.add(label)
     
     def load_embeddings(self):
+        if len(self.view_box.dset) == 0:
+            self.err_msg_load_dset_first()
+            return
+        
         fname = QFileDialog.getOpenFileName(self, "Select Embedding File", str(self.last_dir), "Pytorch Files (*.pth; *.pt)")[0]
         if fname is not None and len(fname) > 0:
             self.view_box.annot.load_embed_from_torch(Path(fname))
             self.radio_annot_on.click()
 
     def save_annot(self) -> Path:
+        if len(self.view_box.dset) == 0:
+            self.err_msg_load_dset_first()
+            return
+        
         fname = QFileDialog.getSaveFileName(self, "Save file", str(self.last_dir), "JSON Files (*.json)")[0]
         if fname is not None and len(fname) > 0:
             self.view_box.annot.save_annotations(Path(fname))
     
     def save_embeddings(self):
+        if len(self.view_box.dset) == 0:
+            self.err_msg_load_dset_first()
+            return
+        
         fname = QFileDialog.getSaveFileName(self, "Save file", str(self.last_dir), "Pytorch Files (*.pth; *.pt)")[0]
         if fname is not None and len(fname) > 0:
             self.view_box.annot.save_embed(Path(fname))
