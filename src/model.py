@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskGenerator
-from utils import normalize
+from utils import normalize, mask_to_bbox
 
 class Model:
     def __init__(self, sam_checkpoint = None, model_type=None, device=None):
@@ -86,16 +86,7 @@ class Canny:
         kernel = np.ones((8, 8), dtype=np.uint8)
         closing = cv.morphologyEx(edge, cv.MORPH_CLOSE, kernel, iterations=self.it_closing)
 
-        # Contours
-        contours, hierarchy = cv.findContours(closing, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-
-        # Bounding rectangle
-        bbox = []
-        for temp in contours:
-            area = cv.contourArea(temp)
-            if area > self.min_area:
-                x, y, w, h = cv.boundingRect(temp)
-                bbox.append(np.array([x, y, x + w, y + h]))
+        bbox = mask_to_bbox(closing, min_area=self.min_area)
 
         return bbox
 
@@ -124,17 +115,7 @@ class MOG2:
         kernel = np.ones((8, 8), dtype=np.uint8)
         closing = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=self.it_closing)
 
-        # Contours
-        contours, hierarchy = cv.findContours(closing, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-
-        # Bounding rectangle
-        bbox = []
-        for temp in contours:
-            area = cv.contourArea(temp)
-            if area > self.min_area:
-                x, y, w, h = cv.boundingRect(temp)
-                bbox.append(np.array([x, y, x + w, y + h]))
-
+        bbox = mask_to_bbox(closing, min_area=self.min_area)
         return bbox
 
     def __train(self):
@@ -182,15 +163,6 @@ class Farneback:
         closing = cv.morphologyEx(mag, cv.MORPH_CLOSE, kernel, iterations=self.it_closing)
         closing = cv.adaptiveThreshold(closing, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
 
-        # Contours
-        contours, hierarchy = cv.findContours(closing, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-
-        # Bounding rectangle
-        bbox = []
-        for temp in contours:
-            area = cv.contourArea(temp)
-            if area > self.min_area:
-                x, y, w, h = cv.boundingRect(temp)
-                bbox.append(np.array([x, y, x + w, y + h]))
+        bbox = mask_to_bbox(closing, min_area=self.min_area)
 
         return bbox

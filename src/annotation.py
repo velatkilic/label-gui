@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import json
-from utils import rle_encode, rle_decode
+from utils import rle_encode, rle_decode, mask_to_bbox
 class Annotation:
     def __init__(self) -> None:
         self.masks = {}
@@ -63,9 +63,12 @@ class Annotation:
     def save_annotations(self, fname):
         annot = []
         for frame_id, mask in self.masks.items():
+            boxes = [mask_to_bbox(255*m.astype(np.uint8))[0].tolist() for m in mask]
             masks = rle_encode(mask)
+            
             frame_annot = {"image_id":frame_id,
                            "masks": masks,
+                           "boxes": boxes,
                            "labels": self.labels[frame_id]}
             annot.append(frame_annot)
 

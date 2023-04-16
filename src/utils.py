@@ -1,6 +1,7 @@
 import numpy as np
 import colorsys
 from pycocotools import mask as coco_mask
+import cv2 as cv
 
 def normalize(x):
     x = x.astype(np.float32)
@@ -65,3 +66,17 @@ def rle_decode(rle_dict):
         mask = coco_mask.decode(rle)
         masks.append(mask.astype(np.bool_))
     return masks
+
+def mask_to_bbox(binary_img, min_area = None, max_area = None):
+    # Contours
+    contours, hierarchy = cv.findContours(binary_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+
+    # Bounding rectangle
+    bboxes = []
+    for contour in contours:
+        x, y, w, h = cv.boundingRect(contour)
+        bbox = np.array([x, y, x + w, y + h])
+        area = cv.contourArea(contour)
+        if (min_area is None or area > min_area) and (max_area is None or area < max_area):
+            bboxes.append(bbox)
+    return bboxes
