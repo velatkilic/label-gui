@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QProgressDialog
+from PyQt5.QtWidgets import QProgressDialog, QMessageBox
 
 import numpy as np
 import os
@@ -10,7 +10,7 @@ from pathlib import Path
 from dataset import Dataset
 from model import Model
 from annotation import Annotation
-from utils import draw_segmentation_masks
+from utils import draw_segmentation_masks, mask_to_bbox
 
 class ViewBox(pg.ViewBox):
     def __init__(self, parent, *args, **kargs):
@@ -48,7 +48,6 @@ class ViewBox(pg.ViewBox):
         self.dset = Dataset()
         self.annot = Annotation()
 
-
     def auto_detect(self, annot_dict, predict_mode, model_type):
         self.parent.label_mode_on()
         if predict_mode == "current":
@@ -79,6 +78,25 @@ class ViewBox(pg.ViewBox):
         self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
         for i in range(len(masks)): self.parent.add_mask(i+1, self.class_label)
+
+    def query_prev_frame(self):
+        if self.idx == 0:
+            err_dlg = QMessageBox(self)
+            err_dlg.setWindowTitle("Error")
+            err_dlg.setText("Cannot query prev detection on frame 0!")
+            err_dlg.exec()
+            return
+        else:
+            prev_masks = self.annot.get_mask(self.idx - 1)
+            if prev_masks is None: return
+
+            prev_labels = self.annot.get_labels(self.idx - 1)
+            for i, m in enumerate(prev_masks):
+                bbox = mask_to_bbox(255*m.astype(np.uint8))[0]
+                mask, _, _ = self.model.predict(input_box=bbox[None, :], multimask_output=False)
+                self.annot.add_annotation(self.idx, mask[0,...], prev_labels[i])
+            
+            self.navigate_to_idx(self.idx)
 
     def load_images(self, fname):
         if len(fname) > 0:

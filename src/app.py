@@ -34,6 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # detection
         self.button_auto_detect.clicked.connect(self.auto_detect)
+        self.button_embedding.clicked.connect(self.compute_embeddings)
+        self.button_query_prev.clicked.connect(self.query_prev_frame)
 
         # label mode
         self.radio_annot_on.clicked.connect(self.label_mode_on)
@@ -65,7 +67,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spinBox_frame_id.valueChanged.connect(self.navigate_to_idx)
         self.button_prev.clicked.connect(self.prev)
         self.button_next.clicked.connect(self.next)
-        self.button_embedding.clicked.connect(self.compute_embeddings)
 
         self.label_mode_off() # start with default off
         self.show_mask_last() # default show the last mask
@@ -77,6 +78,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog.exec()
         self.view_box.auto_detect(dialog.output, dialog.predict_mode, dialog.model_type)
     
+    def query_prev_frame(self):
+        self.radio_annot_on.click()
+        self.view_box.query_prev_frame()
+        self.spinBox_frame_id.setValue(self.view_box.idx)
+
     def update_frame_id(self):
         frame_count = len(self.view_box.dset)
         self.label_frame_count.setText("/"+str(frame_count - 1))

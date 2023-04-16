@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>889</width>
-    <height>706</height>
+    <height>781</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,6 +48,30 @@
         </property>
         <property name="text">
          <string>Auto-Detect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="button_embedding">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Pre-Compute Embeddings</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="button_query_prev">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Query Prev Frame Detections</string>
         </property>
        </widget>
       </item>
@@ -337,18 +361,6 @@
           </property>
           <property name="text">
            <string>Next</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="button_embedding">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Pre-Compute Embeddings</string>
           </property>
          </widget>
         </item>
