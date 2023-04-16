@@ -182,6 +182,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def compute_embeddings(self):
         nframes = len(self.view_box.dset)
         if nframes > 0:
+            self.radio_annot_on.click()
             pb = QProgressDialog("Pre-computing image embeddings ...", "Cancel", 0, nframes)
             pb.setWindowModality(Qt.WindowModal)
             for i in range(nframes):
@@ -190,7 +191,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if pb.wasCanceled():
                     break
                 pb.setValue(i)
-            self.radio_annot_on.click()
 
     def prev(self):
         idx = self.view_box.prev()
