@@ -71,8 +71,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_mode_off() # start with default off
         self.show_mask_last() # default show the last mask
 
-        self.current_annot_idx = 0
-
     def auto_detect(self):
         dialog = AutoDetectDialog(self.view_box.dset, self.view_box.idx, self.view_box.model.sam)
         dialog.exec()
@@ -212,25 +210,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def mask_scale(self, mask_scale):
         self.view_box.mask_scale = mask_scale
 
-    def add_mask(self, idx, class_label):
-        text = str(idx) + " - " + class_label
-        item = QListWidgetItem(text)
+    def add_mask(self, class_label):
+        item = QListWidgetItem(class_label)
         self.annot_list.addItem(item)
-        self.view_box.last_selected_id = idx - 1
+        self.view_box.last_selected_id = self.annot_list.currentRow() - 1
     
     def delete_mask(self):
-        self.view_box.annot.delete_mask(self.view_box.idx, self.current_annot_idx)
-        if self.current_annot_idx == 0:
-            new_id = 0
+        annot_id = self.annot_list.currentRow()
+        self.view_box.annot.delete_mask(self.view_box.idx, annot_id)
+        if annot_id == self.annot_list.count() - 1 and annot_id != 0:
+            self.view_box.last_selected_id = annot_id - 1
         else:
-            new_id = self.current_annot_idx - 1
-        self.view_box.last_selected_id = new_id
-        if self.view_box.show_mask_mode == "last":
-            self.view_box.show_mask_by_id(new_id)
-        else:
-            self.view_box.show_mask_all()
-        
-        self.annot_list.takeItem(self.annot_list.count()-1)
+            self.view_box.last_selected_id = annot_id
+        self.annot_list.takeItem(annot_id)
+        self.view_box.show_mask()
 
     def add_class(self) -> None:
         text = self.class_label.text()
@@ -245,23 +238,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def current_annot_changed(self, item):
         if item is None: return
-
-        mask_text = item.text()
-        idx = int(mask_text.split()[0]) - 1
-        self.current_annot_idx = idx
-
+        idx = self.annot_list.currentRow()
         if self.view_box.show_mask_mode == "last":
             self.view_box.show_mask_by_id(idx)
 
     def change_annot_class_label(self):
         # update listview
         annot_item = self.annot_list.currentItem()
-        text = annot_item.text().split()
-        label_id = int(text[0]) - 1
-        text[-1] = self.view_box.class_label
-        text = " ".join(text)
-        annot_item.setText(text)
-
+        annot_item.setText(self.view_box.class_label)
+        label_id = self.annot_list.currentRow()
         # update annotation
         self.view_box.annot.set_label(self.view_box.idx, label_id, self.view_box.class_label)
 

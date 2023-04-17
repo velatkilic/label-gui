@@ -47,6 +47,7 @@ class Annotation:
             self.labels[frame_id][label_id] = label
 
     def delete_mask(self, frame_idx, annot_idx):
+        print(annot_idx)
         del self.masks[frame_idx][annot_idx]
         del self.labels[frame_idx][annot_idx]
 

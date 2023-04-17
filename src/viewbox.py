@@ -175,7 +175,7 @@ class ViewBox(pg.ViewBox):
 
     def show_mask_by_id(self, mask_id):
         masks = self.annot.get_mask(self.idx)
-        if masks is not None and len(masks) > 0:
+        if masks is not None and len(masks) > mask_id:
             mask = masks[mask_id,:,:]
             self.update_img_annot(mask[None,:,:])
         else:
@@ -257,11 +257,6 @@ class ViewBox(pg.ViewBox):
         self.current_points = None
         self.current_labels = None
         self.current_masks = None
-    
-    def add_to_annot_list(self):
-        masks = self.annot.get_mask(self.idx)
-        mask_id = len(masks)
-        self.parent.add_mask(mask_id, self.class_label)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:
@@ -269,7 +264,7 @@ class ViewBox(pg.ViewBox):
                                       self.current_masks,
                                       self.class_label)
             self.reset_current_annot()
-            self.add_to_annot_list()
+            self.parent.add_mask(self.class_label)
         
         elif event.key() == Qt.Key_Escape:
             self.reset_current_annot()
