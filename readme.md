@@ -86,7 +86,8 @@ Image data can be loaded two different ways
 ### 2.4 Controls <a name="controls"></a>
 This is region 4 highlighted in the screenshot above. I will go from start to buttom:
 - *Auto-Detect*: This is an **experimental feature** that aims to make labelling easier but currently do not work great my data. This will be  The idea is to use simple models to generate object proposals and to fine tune them using SAM. Here is a screenshot for the current version: 
-![](./imgs/auto_detect.png)
+
+    ![](./imgs/auto_detect.png)
 
     Implemented models are:
     - *Sam Automatic Mask Generator*: This uses the automatic mask generator shipped with the current version of SAM which queries a regularly spaced grid and the uses multiple methods (thresholding based on confidence, nms, etc) to filter the output.
