@@ -77,7 +77,7 @@ class ViewBox(pg.ViewBox):
             masks = np.array(masks)
         self.annot.add_auto_detect_annot(self.idx, masks)
         self.update_img_annot(masks)
-        for i in range(len(masks)): self.parent.add_mask(i+1, self.class_label)
+        for i in range(len(masks)): self.parent.add_mask(self.class_label)
 
     def query_prev_frame(self):
         if self.idx == 0:
@@ -119,8 +119,8 @@ class ViewBox(pg.ViewBox):
             self.idx = idx
             labels = self.annot.get_labels(self.idx)
             if labels is not None:
-                for i, label in enumerate(labels):
-                    self.parent.add_mask(i+1, label)
+                for label in labels:
+                    self.parent.add_mask(label)
             self.set_image()
             self.show_mask()
 
