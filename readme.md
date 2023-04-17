@@ -105,13 +105,13 @@ This is region 4 highlighted in the screenshot above. I will go from start to bo
 
 - *Add class label region*: Add a class label by typing its name in the textbox and clicking on the *Add* button. If you want to assign a particular label to a mask: i) select the class and the mask by clicking on them and ii) press the **Shift** key.
 
-- *Prev/Next*: Use these buttons to navigate to different buttons. You can alternative enter the frame ID.
+- *Prev/Next*: Use these buttons to navigate to different buttons. You can alternatively enter the frame ID.
 
 ### 2.5 Summary <a name="summary"></a>
 - **Left** click to add a foreground point
-- **Right** click to subtract a foreground point (or equivalently add a background point)
+- **Right** click to add a background point
 - **Space** bar to add a segmentation mask to the list
-- **Esc** to cancel labelling a segmentation 
+- **Esc** to reject a segmentation mask
 - **Delete** to delete a segmentation label
 - **Shift** to assign a class label to a mask
 - **Left/Right Arrow** keys to navigate to different frames
