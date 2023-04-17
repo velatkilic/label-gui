@@ -3,3 +3,4 @@ imageio>=2.26.0
 imageio-ffmpeg>=0.4.8
 pyqt5>=5.15.9
 pyqtgraph>=0.13.2
+pycocotools>=2.0.6
