@@ -25,12 +25,8 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
     conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
     ```
 
-- Download the latest release of Label-Gui from GitHub (**preferred**) or clone the repository.
-    ```
-    git clone https://github.com/velatkilic/label-gui.git
-    ```
+- Download the latest release of Label-Gui from GitHub (**preferred**) or clone the repository. Downloading the latest release is recommended because I might make breaking changes to the main branch.
 
-    Downloading the latest release is recommended because I might make breaking changes to the main branch.
 - Navigate into the repository and install the required packages
     ```
     cd label-gui
@@ -66,26 +62,26 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
 Image data can be loaded two different ways
 - *File -> Load Video File*: This will present a folder dialog to select a video file (in mp4 or avi formats).
 - *File -> Load Image Folder*: If you have a collection of images under one folder, use this option to load all the images under that folder. Currently, only tiff files are tested but other formats will likely work as well.
-- *File -> Load Annotations*: Load previously save annotation data in json format. Make sure to set the *Show Mask* option to *All* to view all the mask annotations.
+- *File -> Load Annotations*: Load annotation data in json format. Make sure to set the *Show Mask* option to *All* to view all the mask annotations.
 - *File -> Load Embeddings*: Computing the image embeddings for SAM takes long (on my laptop with a GeForce RTX 2070 gpu it takes about 5-6 s per frame). So it is very convenient to *Pre-Compute Embeddings* (takes about 30 mins for a 300 frame video) and leave it running while I grab some coffee to distract my lab mates with conversations about how AI will take over the world, take our jobs, and make us obselete. After the embeddings are computed they can be saved and subsequently loaded for fast operation. 
 - *File -> Save Annotations*: Save annotations in json format.
 - *File -> Save Embeddings*: Save image embeddings for later use to speed up labelling process. 
 
 ### 2.2 Image Viewer <a name="viewer"></a>
 - **Zoom in/out** using the **scroll wheel** of your mouse.
-- **Drag** with a left click to **translate** the image
-- If *Annotate* setting is *On, then
+- **Click and drag** to translate the image
+- If *Annotate* setting is *On*, then
     - **Left click** will include regions (**foreground points**) and
     - **Right click** will exlude regions (**background points**) from the segmentation mask
 - **Press *Space*-bar** to accept a mask or **Esc** to reject it.
 - If you successfully added a segmentation mask, it will appear on the mask list.
 
 ### 2.3 Histogram and Contrast Controls <a name="contrast"></a>
-- Region 3 shown in the screenshot above highlights the image histogram. Use controls there to enhance image contrast to make faint objects easier to see. This is a useful feature for nearly transparent objects in phase contrast images.
+- Region 3 shown in the screenshot above highlights the image histogram. Use controls there to enhance image contrast to make faint objects easier to see. This is a useful feature for nearly transparent objects in phase contrast images. Increasing contrast operates on a copy of the image data and does not affect mask detection.
 
 ### 2.4 Controls <a name="controls"></a>
-This is region 4 highlighted in the screenshot above. I will go from start to buttom:
-- *Auto-Detect*: This is an **experimental feature** that aims to make labelling easier but currently do not work great my data. This will be  The idea is to use simple models to generate object proposals and to fine tune them using SAM. Here is a screenshot for the current version: 
+This is region 4 highlighted in the screenshot above. I will go from start to bottom:
+- *Auto-Detect*: This is an **experimental feature** that aims to make labelling easier but currently does not work great on my data. This will be improved in the future. The idea is to use simple models to generate object proposals and to fine tune them using SAM. Here is a screenshot for the current version: 
 
     ![](./imgs/auto_detect.png)
 
@@ -95,7 +91,7 @@ This is region 4 highlighted in the screenshot above. I will go from start to bu
     - *MOG2 Background Subtractor*: Bounding box proposals are generated using MOG2 background subtractor from OpenCV followed by a morphological closing operation and contour detection. This option makes sense only for video data (ie data with temporal correlations).
     - *Optical Flow (Farneback)*: Bounding box proposals are generated using OpenCV implementation of optical flow followed. Velocity field magnitude is sent through a morphological closing operation, adaptive thresholding and contour detection to generate bounding box proposals. This option makes sense only for video data as well.
 
-- *Pre-Compute Embeddings*: Image embeddings are computed for SAM. These embeddings can be saved and re-loaded for fast operation. Embeddings are cached in RAM and sent to the GPU when a particle frame is used.
+- *Pre-Compute Embeddings*: Image embeddings are computed for SAM. These embeddings can be saved and re-loaded for fast operation. Embeddings are cached in RAM and sent to the GPU when a particular frame is used.
 
 - *Query Prev Frame Detections*: This feature is **very useful for labelling videos** where objects move **slowly**. It will use previous frame masks as proposals for the current frame. The proposals are finetuned using SAM. I am planning to incorporate a simple tracker to model fast moving objects as well.
 
@@ -123,5 +119,6 @@ This is region 4 highlighted in the screenshot above. I will go from start to bu
 
 ## 3. TODO <a name="todo"></a>
 - [ ] Load arbitrary SAM models as opposed to a hard coded directory
+- [ ] Improve auto-detect
 - [ ] Incorporate a multi-object tracker for video data
 - [ ] Enable changes to the class label list
