@@ -4,8 +4,17 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
 ![](./imgs/gui.png)
 
 # Instructions
+## Table of Contents
+- [1. Installation](#installation)
+- [2. Using Label-Gui](#using)
+    - [2.1 Loading and Saving Data](#load_save)
+    - [2.2 Image Viewer](#viewer)
+    - [2.3 Histogram and Contrast Controls](#contrast)
+    - [2.4 Controls](#controls)
+    - [2.5 Keyboard Shortcuts](#summary)
+- [3. TODO](#todo)
 
-## 1. Installation
+## 1. Installation <a name="installation"></a>
 - Create a new conda environment called *label-gui* and activate it
     ```
     conda create -n label-gui python=3.10
@@ -51,9 +60,9 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
     ```
     Note that the model weights directory is relative to the current directory so you need to run the *app.py* file exactly as above.
 
-## 2. Using Label-Gui
+## 2. Using Label-Gui <a name="using"></a>
 ![](./imgs/panels.png)
-### 2.1 Loading and Saving Data
+### 2.1 Loading and Saving Data <a name="load_save"></a>
 Image data can be loaded two different ways
 - *File -> Load Video File*: This will present a folder dialog to select a video file (in mp4 or avi formats).
 - *File -> Load Image Folder*: If you have a collection of images under one folder, use this option to load all the images under that folder. Currently, only tiff files are tested but other formats will likely work as well.
@@ -62,7 +71,7 @@ Image data can be loaded two different ways
 - *File -> Save Annotations*: Save annotations in json format.
 - *File -> Save Embeddings*: Save image embeddings for later use to speed up labelling process. 
 
-### 2.2 Image Viewer
+### 2.2 Image Viewer <a name="viewer"></a>
 - **Zoom in/out** using the **scroll wheel** of your mouse.
 - **Drag** with a left click to **translate** the image
 - If *Annotate* setting is *On, then
@@ -71,10 +80,10 @@ Image data can be loaded two different ways
 - **Press *Space*-bar** to accept a mask or **Esc** to reject it.
 - If you successfully added a segmentation mask, it will appear on the mask list.
 
-### 2.3 Histogram and Contrast Controls
+### 2.3 Histogram and Contrast Controls <a name="contrast"></a>
 - Region 3 shown in the screenshot above highlights the image histogram. Use controls there to enhance image contrast to make faint objects easier to see. This is a useful feature for nearly transparent objects in phase contrast images.
 
-### 2.4 Controls
+### 2.4 Controls <a name="controls"></a>
 This is region 4 highlighted in the screenshot above. I will go from start to buttom:
 - *Auto-Detect*: This is an **experimental feature** that aims to make labelling easier but currently do not work great my data. This will be  The idea is to use simple models to generate object proposals and to fine tune them using SAM. Here is a screenshot for the current version: 
 ![](./imgs/auto_detect.png)
@@ -101,7 +110,7 @@ This is region 4 highlighted in the screenshot above. I will go from start to bu
 
 - *Prev/Next*: Use these buttons to navigate to different buttons. You can alternative enter the frame ID.
 
-### 2.5 Summary
+### 2.5 Summary <a name="summary"></a>
 - **Left** click to add a foreground point
 - **Right** click to subtract a foreground point (or equivalently add a background point)
 - **Space** bar to add a segmentation mask to the list
@@ -111,7 +120,7 @@ This is region 4 highlighted in the screenshot above. I will go from start to bu
 - **Left/Right Arrow** keys to navigate to different frames
 - **Scroll Wheel** to zoom in/out in the image viewer.
 
-## TODO
+## 3. TODO <a name="todo"></a>
 - [ ] Load arbitrary SAM models as opposed to a hard coded directory
 - [ ] Incorporate a multi-object tracker for video data
 - [ ] Enable changes to the class label list
