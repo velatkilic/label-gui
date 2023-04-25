@@ -70,6 +70,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_save_annot.triggered.connect(self.save_annot)
         self.action_save_embeddings.triggered.connect(self.save_embeddings)
 
+        # action menu items: Dnn
+        self.action_load_SAM.triggered.connect(self.load_SAM)
+
         # prev/next
         self.spinBox_frame_id.valueChanged.connect(self.navigate_to_idx)
         self.button_prev.clicked.connect(self.prev)
@@ -104,6 +107,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_frame_count.setText("/" + str(frame_count - 1))
         self.spinBox_frame_id.setMaximum(frame_count)
 
+    def load_SAM(self):
+        model_type_dict = {"sam_vit_b_01ec64":"vit_b",
+                           "sam_vit_h_4b8939":"vit_h",
+                           "sam_vit_l_0b3195":"vit_l"}
+        
+        fname = QFileDialog.getOpenFileName(self, "Select SAM Model", str(os.path.join(os.getcwd(), "models")), "SAM Files (*.pth; *.PTH")[0]
+        
+        if fname is not None and len(fname) > 0:
+            fname = Path(fname)
+            if fname.stem in model_type_dict:
+                model_type = model_type_dict[fname.stem]
+            else:
+                self.err_msg_box("Incorrect SAM model. Accepted file names are: sam_vit_b_01ec64, sam_vit_h_4b8939, sam_vit_l_0b3195")
+                return
+            self.view_box.model.set_SAM_model(model_type, str(fname))
+            self.view_box.annot.clear_img_embed()
+            self.navigate_to_idx(self.view_box.idx)
+
     def load_images(self) -> None:
         """Load image folder
         User is presented with a dialog to select an image folder (only tiff is tested)
@@ -135,15 +156,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.view_box.load_video(fname)
             self.update_frame_id()
             self.set_hist()
+    
+    def err_msg_box(self, err_msg):
+        err_dlg = QMessageBox(self)
+        err_dlg.setWindowTitle("Error")
+        err_dlg.setText(err_msg)
+        err_dlg.exec()
 
     def err_msg_load_dset_first(self) -> None:
         """Presents user with an error message saying image or video data
         should be opened first.
         """
-        err_dlg = QMessageBox(self)
-        err_dlg.setWindowTitle("Error")
-        err_dlg.setText("Load an image folder or a video file first!")
-        err_dlg.exec()
+        self.err_msg_box("Load an image folder or a video file first!")
 
     def load_annot(self) -> None:
         """Load annotation data
@@ -215,6 +239,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def label_mode_on(self) -> None:
         """Set label mode to on for the view box and enable the mask scale spin box
         """
+        if not(self.view_box.model.model_set):
+            self.err_msg_box("Load a DNN model first!")
+            self.radio_annot_off.click()
+            return
         self.spinBox_mask_scale.setEnabled(True)
         self.view_box.set_label_mode("on")
 

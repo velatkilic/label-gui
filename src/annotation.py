@@ -29,6 +29,9 @@ class Annotation:
 
     def add_img_embed(self, frame_id, img_embed):
         self.img_embed[frame_id] = img_embed
+    
+    def clear_img_embed(self):
+        self.img_embed = {}
 
     def get_mask(self, frame_id):
         if frame_id in self.masks:

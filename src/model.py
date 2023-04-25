@@ -13,15 +13,18 @@ class Model:
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        if sam_checkpoint is None:
-            sam_checkpoint = os.path.join(os.getcwd(), "models" ,"sam_vit_h_4b8939.pth")
-        
-        if model_type is None:
-            model_type = "vit_h"
-        
+        if (model_type is not None) and (sam_checkpoint is not None):
+            self.set_SAM_model(model_type, sam_checkpoint)
+            self.model_set = True
+        else:
+            self.model_set = False
+
+
+    def set_SAM_model(self, model_type, sam_checkpoint):
         self.sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
         self.sam.to(device=self.device)
         self.predictor = SamPredictor(self.sam)
+        self.model_set = True
     
     def set_cached_img_embed(self, original_size=None, input_size=None, features=None):
         self.predictor.reset_image()

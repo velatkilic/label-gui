@@ -36,7 +36,7 @@ Label-GUI is a lightweight graphical user interface based on PyQt5 and pyqtgraph
     ```
     pip install git+https://github.com/facebookresearch/segment-anything.git
     ```
-- [Download the model weights](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth). The link posted here might be broken so make sure to check [their GitHub repo](https://github.com/facebookresearch/segment-anything). Currently only the large model is used with the following file name: *sam_vit_h_4b8939.pth*. This will be changed in future releases. 
+- [Download the model weights](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth). The link posted here might be broken so make sure to check [their GitHub repo](https://github.com/facebookresearch/segment-anything). When you want to annotate segmentation masks, navigate to Dnn -> Load SAM to load the model weights. Currently, supported weights are: *sam_vit_b_01ec64*, *sam_vit_h_4b8939*, *sam_vit_l_0b3195* 
 - Create a *models* folder under label gui and copy the downloaded model weight under this folder. So the file structure should look like this
     ```
     +-- imgs
@@ -118,7 +118,7 @@ This is region 4 highlighted in the screenshot above. I will go from start to bo
 - **Scroll Wheel** to zoom in/out in the image viewer.
 
 ## 3. TODO <a name="todo"></a>
-- [ ] Load arbitrary SAM models as opposed to a hard coded directory
+- [x] Load arbitrary SAM models as opposed to a hard coded directory
 - [ ] Improve auto-detect
 - [ ] Incorporate a multi-object tracker for video data
 - [ ] Enable changes to the class label list
